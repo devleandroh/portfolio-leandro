@@ -3,7 +3,7 @@ import { join } from "node:path";
 import Image from "next/image";
 import { profile } from "@/config/profile";
 
-const PHOTO = "/images/leandro-profile-photo.png";
+const PHOTO = "/images/leandro-profile-photo.jpg";
 
 /**
  * Apresentação pessoal do hero: foto circular discreta + nome e área de atuação.
