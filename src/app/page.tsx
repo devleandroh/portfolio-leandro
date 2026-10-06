@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Database, LayoutDashboard, Workflow, AppWindow } from "lucide-react";
 import { PipelineDiagram } from "@/components/site/PipelineDiagram";
+import { ProfileIntro } from "@/components/site/ProfileIntro";
 import { SiteFooter, SiteHeader } from "@/components/site/SiteHeader";
 import { contactLinks, profile } from "@/config/profile";
 import { cases } from "@/content/cases";
@@ -56,7 +57,7 @@ export default function Home() {
         <section className="blueprint border-b border-line">
           <div className="mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 md:py-24 lg:grid-cols-[1.05fr_1fr] lg:items-center">
             <div>
-              <p className="font-mono text-xs tracking-wide text-accent-strong uppercase">{profile.role}</p>
+              <ProfileIntro />
               <h1 className="mt-4 text-4xl leading-[1.08] font-semibold tracking-tight text-balance sm:text-5xl">
                 {profile.headline}
               </h1>
