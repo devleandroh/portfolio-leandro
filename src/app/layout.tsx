@@ -15,7 +15,11 @@ const plexMono = IBM_Plex_Mono({
   weight: ["400", "500"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000";
+// Em produção na Vercel, cai para o domínio do projeto se NEXT_PUBLIC_SITE_URL não estiver definida,
+// para que a imagem Open Graph nunca aponte para localhost.
+const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim();
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() || (vercelUrl ? `https://${vercelUrl}` : "http://localhost:3000");
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
