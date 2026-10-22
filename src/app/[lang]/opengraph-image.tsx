@@ -1,17 +1,22 @@
 import { ImageResponse } from "next/og";
-import { profile } from "@/config/profile";
+import { getProfile } from "@/config/profile";
+import { defaultLocale, hasLocale } from "@/i18n/config";
+import { getDictionary } from "@/i18n/dictionaries";
 
 /**
  * Imagem de pré-visualização (Open Graph) usada quando o link é compartilhado
  * no LinkedIn, WhatsApp etc. Sem ela, o link aparece sem imagem no feed.
+ * Gerada uma vez por idioma.
  */
-export const alt = `${profile.name} — ${profile.role}`;
+export const alt = `${getProfile(defaultLocale).name} — ${getProfile(defaultLocale).role}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const PROBLEMAS = ["Dados em planilhas", "Processos manuais", "Dashboards que não decidem"];
-
-export default function OpengraphImage() {
+export default async function OpengraphImage({ params }: { params: Promise<{ lang: string }> }) {
+  const value = (await params).lang;
+  const lang = hasLocale(value) ? value : defaultLocale;
+  const profile = getProfile(lang);
+  const t = getDictionary(lang).og;
   return new ImageResponse(
     (
       <div
@@ -36,7 +41,7 @@ export default function OpengraphImage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
           <div style={{ fontSize: 62, fontWeight: 700, lineHeight: 1.1, letterSpacing: -1 }}>{profile.headline}</div>
           <div style={{ display: "flex", gap: 14 }}>
-            {PROBLEMAS.map((p) => (
+            {t.problems.map((p) => (
               <div
                 key={p}
                 style={{
@@ -54,7 +59,7 @@ export default function OpengraphImage() {
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 26, color: "rgba(255,255,255,0.6)" }}>
           <div>{profile.name}</div>
-          <div>3 cases com demonstração funcional</div>
+          <div>{t.footer}</div>
         </div>
       </div>
     ),

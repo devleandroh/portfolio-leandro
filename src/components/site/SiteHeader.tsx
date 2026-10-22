@@ -1,12 +1,8 @@
 import Link from "next/link";
-import { profile } from "@/config/profile";
-
-const NAV = [
-  { href: "/#cases", label: "Cases" },
-  { href: "/#competencias", label: "Competências" },
-  { href: "/#stack", label: "Tecnologias" },
-  { href: "/#contato", label: "Contato" },
-];
+import { getProfile } from "@/config/profile";
+import { localePath, type Locale } from "@/i18n/config";
+import { getDictionary } from "@/i18n/dictionaries";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 
 export function Monogram({ className = "" }: { className?: string }) {
   return (
@@ -18,30 +14,41 @@ export function Monogram({ className = "" }: { className?: string }) {
   );
 }
 
-export function SiteHeader() {
+export function SiteHeader({ lang }: { lang: Locale }) {
+  const t = getDictionary(lang);
+  const nav = [
+    { href: "/#cases", label: t.header.nav.cases },
+    { href: "/#competencias", label: t.header.nav.skills },
+    { href: "/#stack", label: t.header.nav.stack },
+    { href: "/#contato", label: t.header.nav.contact },
+  ];
+
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-page/90 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2.5">
+        <Link href={localePath(lang, "/")} className="flex items-center gap-2.5">
           <Monogram className="h-7 w-7 text-ink" />
-          <span className="text-sm font-semibold tracking-tight">{profile.name}</span>
-          <span className="hidden font-mono text-xs text-muted sm:inline">/ dados &amp; software</span>
+          <span className="text-sm font-semibold tracking-tight">{getProfile(lang).name}</span>
+          <span className="hidden font-mono text-xs text-muted sm:inline">{t.header.tagline}</span>
         </Link>
         <nav className="flex items-center gap-1 text-sm">
-          {NAV.map((n) => (
+          {nav.map((n) => (
             <Link
               key={n.href}
-              href={n.href}
+              href={localePath(lang, n.href)}
               className="hidden rounded px-3 py-1.5 text-ink-2 transition-colors hover:bg-wash hover:text-ink md:inline-block"
             >
               {n.label}
             </Link>
           ))}
+          <span className="mr-1 md:mx-2">
+            <LanguageSwitcher lang={lang} label={t.language.label} names={t.language} />
+          </span>
           <Link
-            href="/#cases"
-            className="rounded bg-ink px-3 py-1.5 font-medium text-surface transition-colors hover:bg-accent-strong md:ml-2"
+            href={localePath(lang, "/#cases")}
+            className="rounded bg-ink px-3 py-1.5 font-medium text-surface transition-colors hover:bg-accent-strong"
           >
-            Ver demos
+            {t.header.cta}
           </Link>
         </nav>
       </div>
@@ -49,14 +56,13 @@ export function SiteHeader() {
   );
 }
 
-export function SiteFooter() {
+export function SiteFooter({ lang }: { lang: Locale }) {
+  const t = getDictionary(lang).footer;
   return (
     <footer className="border-t border-line">
       <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-8 text-xs text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        <p>
-          © {new Date().getFullYear()} {profile.name}. Projeto pessoal de portfólio.
-        </p>
-        <p>Todos os dados exibidos nas demonstrações são fictícios, gerados para fins ilustrativos.</p>
+        <p>{t.copyright(new Date().getFullYear(), getProfile(lang).name)}</p>
+        <p>{t.disclaimer}</p>
       </div>
     </footer>
   );

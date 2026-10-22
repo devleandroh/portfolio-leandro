@@ -1,7 +1,9 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import Image from "next/image";
-import { profile } from "@/config/profile";
+import { getProfile } from "@/config/profile";
+import type { Locale } from "@/i18n/config";
+import { getDictionary } from "@/i18n/dictionaries";
 
 const PHOTO = "/images/leandro-profile-photo.jpg";
 
@@ -10,7 +12,8 @@ const PHOTO = "/images/leandro-profile-photo.jpg";
  * A foto só é exibida se o arquivo existir em public/ (verificado no build),
  * evitando imagem quebrada.
  */
-export function ProfileIntro() {
+export function ProfileIntro({ lang }: { lang: Locale }) {
+  const profile = getProfile(lang);
   const hasPhoto = existsSync(join(process.cwd(), "public", PHOTO));
 
   if (!hasPhoto) {
@@ -21,7 +24,7 @@ export function ProfileIntro() {
     <div className="mb-2 flex items-center gap-4">
       <Image
         src={PHOTO}
-        alt={`Foto de ${profile.name}`}
+        alt={getDictionary(lang).profile.photoAlt(profile.name)}
         width={128}
         height={128}
         priority

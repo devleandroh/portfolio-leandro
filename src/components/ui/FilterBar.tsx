@@ -17,14 +17,24 @@ export interface SelectFilter {
  * Barra de filtros: um formulário GET comum (funciona sem JavaScript) que,
  * com JavaScript, atualiza a URL sem recarregar a página a cada alteração.
  */
+export interface FilterBarLabels {
+  all: string;
+  search: string;
+  apply: string;
+  clear: string;
+  updating: string;
+}
+
 export function FilterBar({
   segmented,
   selects,
   search,
+  labels,
 }: {
   segmented?: SelectFilter;
   selects: SelectFilter[];
   search?: { name: string; value: string; placeholder: string };
+  labels: FilterBarLabels;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -87,7 +97,7 @@ export function FilterBar({
             onChange={apply}
             className="h-8 rounded-md border border-line bg-page px-2 text-sm hover:border-axis sm:max-w-[200px]"
           >
-            <option value="">{s.all ?? "Todos"}</option>
+            <option value="">{s.all ?? labels.all}</option>
             {s.options.map((o) => (
               <option key={o.value} value={o.value}>
                 {o.label}
@@ -99,7 +109,7 @@ export function FilterBar({
 
       {search && (
         <label className="flex min-w-[180px] flex-1 flex-col gap-1">
-          <span className="text-[11px] font-medium text-muted">Buscar</span>
+          <span className="text-[11px] font-medium text-muted">{labels.search}</span>
           <span className="relative">
             <Search className="pointer-events-none absolute top-2 left-2 h-4 w-4 text-muted" />
             <input
@@ -115,7 +125,7 @@ export function FilterBar({
 
       <div className="flex items-center gap-2">
         <button type="submit" className="h-8 rounded-md bg-ink px-3 text-xs font-medium text-surface hover:bg-accent-strong">
-          Aplicar
+          {labels.apply}
         </button>
         {hasFilters && (
           <button
@@ -123,10 +133,10 @@ export function FilterBar({
             onClick={() => startTransition(() => router.push(pathname, { scroll: false }))}
             className="inline-flex h-8 items-center gap-1 rounded-md px-2 text-xs text-ink-2 hover:bg-wash"
           >
-            <RotateCcw className="h-3.5 w-3.5" /> Limpar
+            <RotateCcw className="h-3.5 w-3.5" /> {labels.clear}
           </button>
         )}
-        {pending && <Loader2 className="h-4 w-4 animate-spin text-muted" aria-label="Atualizando" />}
+        {pending && <Loader2 className="h-4 w-4 animate-spin text-muted" aria-label={labels.updating} />}
       </div>
     </form>
   );

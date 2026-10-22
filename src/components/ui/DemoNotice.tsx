@@ -1,11 +1,14 @@
 import { FlaskConical } from "lucide-react";
+import type { Locale } from "@/i18n/config";
+import { getDictionary } from "@/i18n/dictionaries";
 
-export function DemoNotice({ compact = false }: { compact?: boolean }) {
+export function DemoNotice({ lang, compact = false }: { lang: Locale; compact?: boolean }) {
+  const t = getDictionary(lang).demoNotice;
   if (compact) {
     return (
       <p className="inline-flex items-center gap-1.5 text-xs text-ink-2">
         <FlaskConical className="h-3.5 w-3.5 text-accent" />
-        Ambiente demonstrativo — todos os dados são fictícios.
+        {t.compact}
       </p>
     );
   }
@@ -13,8 +16,7 @@ export function DemoNotice({ compact = false }: { compact?: boolean }) {
     <div className="flex items-start gap-2.5 rounded-md border border-accent-soft bg-accent-soft/35 px-3.5 py-2.5 text-sm text-ink">
       <FlaskConical className="mt-0.5 h-4 w-4 shrink-0 text-accent-strong" />
       <p>
-        <strong className="font-semibold">Ambiente demonstrativo</strong> — todos os dados apresentados são fictícios,
-        gerados por um algoritmo. Nomes de pessoas e empresas não correspondem a ninguém real.
+        <strong className="font-semibold">{t.strong}</strong> {t.full}
       </p>
     </div>
   );

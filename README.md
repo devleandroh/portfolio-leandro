@@ -158,9 +158,10 @@ GitHub → Vercel, primeiro deploy e domínio.
 5. **Verificação** — inclua as comparações em `scripts/verify-db.ts` e rode `npm run db:verify`.
 6. **Acesso** — adicione `get<Dominio>Dataset()` em `src/lib/data/repository.ts`.
 7. **Indicadores** — funções puras em `src/lib/analytics/<dominio>.ts` + testes em `tests/`.
-8. **Tela** — `src/app/demo/<slug>/page.tsx`, reaproveitando `Kpi`, `Panel`, `BarList`, `FilterBar`,
+8. **Tela** — `src/app/[lang]/demo/<slug>/page.tsx`, reaproveitando `Kpi`, `Panel`, `BarList`, `FilterBar`,
    `TrendChart` e `ColumnChart`; inclua o link em `src/components/demo/DemoNav.tsx`.
-9. **Portfólio** — adicione o case em `src/content/cases.ts` (aparece na home e em `/cases/<slug>`).
+9. **Portfólio** — adicione o case em `src/content/cases.ts`, em português e em inglês (aparece na home e em `/cases/<slug>`).
+10. **Idiomas** — textos da interface em `src/i18n/dictionaries.ts`; valores vindos do banco (status, categorias, produtos…) traduzidos em `src/i18n/data.ts`. Português fica nas URLs sem prefixo e inglês em `/en/...`.
 
 ## Segurança e privacidade
 

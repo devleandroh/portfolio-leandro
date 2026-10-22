@@ -1,7 +1,9 @@
+import type { Locale } from "@/i18n/config";
+
 /**
- * Conteúdo dos cases exibidos no portfólio.
- * Para adicionar um case novo, inclua um objeto aqui e crie a rota da
- * demonstração em src/app/demo/<slug>/ (ver README → "Como adicionar novos cases").
+ * Conteúdo dos cases exibidos no portfólio, em cada idioma.
+ * Para adicionar um case novo, inclua um objeto em `pt` e em `en` e crie a rota da
+ * demonstração em src/app/[lang]/demo/<slug>/ (ver README → "Como adicionar novos cases").
  */
 export interface CaseStudy {
   slug: string;
@@ -18,7 +20,7 @@ export interface CaseStudy {
   pipeline: string[];
 }
 
-export const cases: CaseStudy[] = [
+const pt: CaseStudy[] = [
   {
     slug: "compras-360",
     index: "01",
@@ -99,4 +101,88 @@ export const cases: CaseStudy[] = [
   },
 ];
 
-export const getCase = (slug: string) => cases.find((c) => c.slug === slug);
+const en: CaseStudy[] = [
+  {
+    slug: "compras-360",
+    index: "01",
+    name: "Procurement 360",
+    tagline: "End-to-end visibility of the purchasing cycle: from purchase request to invoice.",
+    demoHref: "/demo/compras",
+    problem:
+      "In many operations, nobody knows for sure which stage each purchase is at. Requests, orders and invoices live in separate screens and spreadsheets, and the question \"where is my purchase?\" turns into a chain of messages.",
+    solution:
+      "A dashboard that connects request, order and invoice in a single timeline, with metrics for volume, value, time between stages and alerts for late orders.",
+    outcome: [
+      "Anyone can find the status of a purchase in seconds, by number or supplier.",
+      "Bottlenecks become visible: average time per stage and distribution of the full cycle.",
+      "Late orders show up before they become a problem.",
+    ],
+    features: [
+      "Request → Order → Invoice funnel",
+      "Average and median time between stages",
+      "Negotiated savings (estimated × purchased)",
+      "Filters by period, cost center, category and status",
+      "Process detail with items and linked invoices",
+    ],
+    stack: ["Next.js", "TypeScript", "PostgreSQL", "Supabase", "Recharts", "Tailwind CSS"],
+    entities: ["Requests and items", "Orders and items", "Invoices", "Suppliers", "Products", "Cost centers", "Users"],
+    pipeline: ["Source systems", "Relational model", "Process views", "Web dashboard"],
+  },
+  {
+    slug: "faturamento",
+    index: "02",
+    name: "Revenue Dashboard",
+    tagline: "Revenue, average ticket and returns with automatic period-over-period comparison.",
+    demoHref: "/demo/faturamento",
+    problem:
+      "Monthly revenue closing is often assembled by hand in spreadsheets. Comparing periods, regions or categories means rework, and the numbers change depending on who builds the report.",
+    solution:
+      "A dashboard that reads invoices straight from the database, calculates net revenue, average ticket and returns, and compares every slice with the same period of the previous year.",
+    outcome: [
+      "A single source of truth for revenue, with no manual consolidation.",
+      "Year-over-year comparison for any combination of filters.",
+      "Customer concentration and returns monitored continuously.",
+    ],
+    features: [
+      "Net and gross revenue, invoices and average ticket",
+      "Monthly trend × previous year",
+      "Analysis by category, region and segment",
+      "Customer, sales rep and product rankings",
+      "Monthly return rate",
+    ],
+    stack: ["Next.js", "TypeScript", "PostgreSQL", "Supabase", "Recharts", "Tailwind CSS"],
+    entities: ["Invoices and items", "Customers", "Products and categories", "Sales reps", "Regions"],
+    pipeline: ["Invoices", "Item fact table", "Period aggregations", "Dashboard"],
+  },
+  {
+    slug: "legal-bi",
+    index: "03",
+    name: "Legal BI",
+    tagline: "Case portfolio, financial risk and deadlines in a single dashboard.",
+    demoHref: "/demo/juridico",
+    problem:
+      "Legal portfolios are often tracked in spreadsheets maintained by different people. There is no consolidated view of amounts in dispute, risk, critical deadlines and the outcome of closed cases.",
+    solution:
+      "A legal BI that organizes cases, activity and deadlines, shows the distribution by area, court and status, and highlights overdue or upcoming deadlines.",
+    outcome: [
+      "Amount in dispute and provisions visible by area and risk level.",
+      "Critical deadlines highlighted before they expire.",
+      "History of each case in an activity timeline.",
+    ],
+    features: [
+      "Active and closed cases, and success rate",
+      "Distribution by status, area and court",
+      "Active portfolio aging",
+      "Deadline calendar (overdue, 7 and 30 days)",
+      "Case file with activity history",
+    ],
+    stack: ["Next.js", "TypeScript", "PostgreSQL", "Supabase", "Recharts", "Tailwind CSS"],
+    entities: ["Cases", "Activity", "Deadlines", "Clients", "Lawyers", "Areas", "Courts"],
+    pipeline: ["Spreadsheets and systems", "Relational model", "Analytical views", "Web BI"],
+  },
+];
+
+const cases: Record<Locale, CaseStudy[]> = { pt, en };
+
+export const getCases = (lang: Locale) => cases[lang];
+export const getCase = (lang: Locale, slug: string) => cases[lang].find((c) => c.slug === slug);

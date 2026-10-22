@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { TrendChart } from "@/components/charts/Charts";
 import { SERIES } from "@/components/charts/series";
 import { DemoHeader } from "@/components/demo/DemoHeader";
@@ -6,12 +7,26 @@ import { Badge, BarList, Delta, EmptyState, Kpi, Pagination, Panel, Table, td, t
 import { FilterBar } from "@/components/ui/FilterBar";
 import { paginate, type SearchParams } from "@/lib/analytics/common";
 import { analisarFaturamento, opcoesFat, parseFatFiltros, PERIODOS_FAT } from "@/lib/analytics/faturamento";
+import { hasLocale, localePath } from "@/i18n/config";
+import { translateProduct, valueTranslator } from "@/i18n/data";
+import { getDictionary } from "@/i18n/dictionaries";
 import { getFaturamentoDataset } from "@/lib/data/repository";
-import { fmtDate, fmtInt, fmtMoney, fmtMoneyShort, fmtMonth, fmtPct } from "@/lib/format";
+import { formatters } from "@/lib/format";
 
-export const metadata: Metadata = { title: "Faturamento — demonstração" };
+export async function generateMetadata({ params }: PageProps<"/[lang]/demo/faturamento">): Promise<Metadata> {
+  const { lang } = await params;
+  if (!hasLocale(lang)) return {};
+  const t = getDictionary(lang);
+  return { title: `${t.faturamento.metaTitle} — ${t.meta.demoSuffix}` };
+}
 
-export default async function FaturamentoPage({ searchParams }: PageProps<"/demo/faturamento">) {
+export default async function FaturamentoPage({ params: route, searchParams }: PageProps<"/[lang]/demo/faturamento">) {
+  const { lang } = await route;
+  if (!hasLocale(lang)) notFound();
+  const t = getDictionary(lang);
+  const f = t.faturamento;
+  const tv = valueTranslator(lang);
+  const { fmtDate, fmtInt, fmtMoney, fmtMoneyShort, fmtMonth, fmtPct } = formatters(lang);
   const sp = (await searchParams) as SearchParams;
   const { data, today, warning } = await getFaturamentoDataset();
   const filtros = parseFatFiltros(sp);
@@ -23,81 +38,86 @@ export default async function FaturamentoPage({ searchParams }: PageProps<"/demo
     Object.entries({ periodo: filtros.periodo, regiao: filtros.regiao, categoria: filtros.categoria, vendedor: filtros.vendedor, segmento: filtros.segmento }).filter(([, v]) => v),
   );
   const pagina = paginate(a.notas, Number(sp.pagina) || 1, 12);
-  const periodoTxt = `${fmtDate(a.intervalo.inicio)} a ${fmtDate(a.intervalo.fim)}`;
-  const anteriorTxt = `${fmtDate(a.intervalo.inicioAnterior)} a ${fmtDate(a.intervalo.fimAnterior)}`;
+  const periodoTxt = f.range(fmtDate(a.intervalo.inicio), fmtDate(a.intervalo.fim));
+  const anteriorTxt = f.range(fmtDate(a.intervalo.inicioAnterior), fmtDate(a.intervalo.fimAnterior));
+  const traduzir = <T extends { name: string }>(items: T[]) => items.map((i) => ({ ...i, name: tv(i.name) }));
 
   return (
     <>
       <DemoHeader
-        title="Dashboard de Faturamento"
-        description="Receita líquida, volume de notas, ticket médio e devoluções — sempre comparados ao mesmo período do ano anterior."
+        lang={lang}
+        title={f.title}
+        description={f.description}
         today={today}
         warning={warning}
       />
 
       <FilterBar
         key={JSON.stringify(params)}
-        segmented={{ name: "periodo", label: "Período", value: filtros.periodo, options: PERIODOS_FAT.map((p) => ({ value: p.value, label: p.label })) }}
+        segmented={{ name: "periodo", label: f.filters.period, value: filtros.periodo, options: PERIODOS_FAT.map((p) => ({ value: p.value, label: tv(p.label) })) }}
         selects={[
-          { name: "regiao", label: "Região", value: filtros.regiao, all: "Todas", options: opcoes.regioes.map((v) => ({ value: v, label: v })) },
-          { name: "categoria", label: "Categoria", value: filtros.categoria, all: "Todas", options: opcoes.categorias.map((v) => ({ value: v, label: v })) },
-          { name: "segmento", label: "Segmento", value: filtros.segmento, options: opcoes.segmentos.map((v) => ({ value: v, label: v })) },
-          { name: "vendedor", label: "Vendedor", value: filtros.vendedor, options: opcoes.vendedores.map((v) => ({ value: v, label: v })) },
+          { name: "regiao", label: f.filters.region, value: filtros.regiao, all: t.ui.filters.allF, options: opcoes.regioes.map((v) => ({ value: v, label: tv(v) })) },
+          { name: "categoria", label: f.filters.category, value: filtros.categoria, all: t.ui.filters.allF, options: opcoes.categorias.map((v) => ({ value: v, label: tv(v) })) },
+          { name: "segmento", label: f.filters.segment, value: filtros.segmento, options: opcoes.segmentos.map((v) => ({ value: v, label: tv(v) })) },
+          { name: "vendedor", label: f.filters.seller, value: filtros.vendedor, options: opcoes.vendedores.map((v) => ({ value: v, label: v })) },
         ]}
+        labels={t.ui.filters}
       />
 
       <p className="mt-3 text-xs text-muted">
-        Período analisado: <span className="text-ink-2">{periodoTxt}</span> · comparação: {anteriorTxt}
+        {f.analyzed} <span className="text-ink-2">{periodoTxt}</span> · {f.comparison} {anteriorTxt}
       </p>
 
       {k.atual.notas === 0 ? (
         <div className="mt-4">
-          <EmptyState>Nenhuma nota encontrada para os filtros selecionados.</EmptyState>
+          <EmptyState>{f.empty}</EmptyState>
         </div>
       ) : (
         <>
           <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
-            <Kpi label="Faturamento líquido" value={fmtMoneyShort(k.atual.liquido)} delta={k.variacao.liquido} hint="Vendas menos devoluções" />
-            <Kpi label="Notas emitidas" value={fmtInt(k.atual.notas)} delta={k.variacao.notas} hint="Notas de venda autorizadas" />
-            <Kpi label="Ticket médio" value={fmtMoney(k.atual.ticket)} delta={k.variacao.ticket} hint="Faturamento bruto ÷ notas" />
+            <Kpi label={f.kpi.net} value={fmtMoneyShort(k.atual.liquido)} delta={k.variacao.liquido} hint={f.kpi.netHint} />
+            <Kpi label={f.kpi.invoices} value={fmtInt(k.atual.notas)} delta={k.variacao.notas} hint={f.kpi.invoicesHint} />
+            <Kpi label={f.kpi.ticket} value={fmtMoney(k.atual.ticket)} delta={k.variacao.ticket} hint={f.kpi.ticketHint} />
             <Kpi
-              label="Devoluções"
+              label={f.kpi.returns}
               value={fmtMoneyShort(k.atual.devolucoes)}
               delta={k.variacao.devolucoes}
               invert
-              hint={`${fmtPct(k.atual.taxaDevolucao)} do faturamento bruto`}
+              hint={f.kpi.returnsHint(fmtPct(k.atual.taxaDevolucao))}
             />
-            <Kpi label="Clientes ativos" value={fmtInt(k.atual.clientes)} delta={k.variacao.clientes} hint="Com ao menos uma compra no período" />
+            <Kpi label={f.kpi.customers} value={fmtInt(k.atual.clientes)} delta={k.variacao.clientes} hint={f.kpi.customersHint} />
           </div>
 
           <div className="mt-3 grid gap-3 lg:grid-cols-3">
-            <Panel title="Evolução mensal do faturamento líquido" subtitle="Últimos 12 meses fechados × mesmos meses do ano anterior" className="lg:col-span-2">
+            <Panel title={f.trend} subtitle={f.trendSub} className="lg:col-span-2">
               <TrendChart
+                lang={lang}
                 data={a.mensal.map((m) => ({ mes: fmtMonth(m.mes), atual: Math.round(m.atual), anterior: Math.round(m.anterior) }))}
                 xKey="mes"
                 series={[
-                  { key: "atual", name: "Últimos 12 meses", color: SERIES.blue },
-                  { key: "anterior", name: "Ano anterior", color: SERIES.comparison, dashed: true },
+                  { key: "atual", name: f.last12, color: SERIES.blue },
+                  { key: "anterior", name: f.lastYear, color: SERIES.comparison, dashed: true },
                 ]}
               />
             </Panel>
-            <Panel title="Taxa de devolução" subtitle="Devoluções ÷ faturamento bruto, meses fechados">
+            <Panel title={f.returnRate} subtitle={f.returnRateSub}>
               <TrendChart
+                lang={lang}
                 data={a.mensal.map((m) => ({ mes: fmtMonth(m.mes), taxa: Number(m.taxaDevolucao.toFixed(4)) }))}
                 xKey="mes"
-                series={[{ key: "taxa", name: "Taxa de devolução", color: SERIES.orange }]}
+                series={[{ key: "taxa", name: f.returnRate, color: SERIES.orange }]}
                 format="pct"
               />
             </Panel>
           </div>
 
           <div className="mt-3 grid gap-3 lg:grid-cols-3">
-            <Panel title="Por categoria" subtitle="Faturamento líquido e variação anual">
+            <Panel title={f.byCategory} subtitle={f.byCategorySub}>
               <ul className="space-y-2.5">
                 {a.porCategoria.map((c) => (
                   <li key={c.name}>
                     <div className="flex items-baseline justify-between gap-2 text-xs">
-                      <span className="truncate text-ink-2">{c.name}</span>
+                      <span className="truncate text-ink-2">{tv(c.name)}</span>
                       <span className="flex shrink-0 items-baseline gap-2">
                         <span className="font-medium tabular">{fmtMoneyShort(c.value)}</span>
                         <span className="w-16 text-right">
@@ -112,28 +132,28 @@ export default async function FaturamentoPage({ searchParams }: PageProps<"/demo
                 ))}
               </ul>
             </Panel>
-            <Panel title="Por região">
-              <BarList items={a.porRegiao} format={fmtMoneyShort} secondary={(i) => fmtPct(i.value / (k.atual.liquido || 1))} />
+            <Panel title={f.byRegion}>
+              <BarList items={traduzir(a.porRegiao)} format={fmtMoneyShort} secondary={(i) => fmtPct(i.value / (k.atual.liquido || 1))} />
             </Panel>
-            <Panel title="Por segmento de cliente">
-              <BarList items={a.porSegmento} format={fmtMoneyShort} secondary={(i) => fmtPct(i.value / (k.atual.liquido || 1))} />
+            <Panel title={f.bySegment}>
+              <BarList items={traduzir(a.porSegmento)} format={fmtMoneyShort} secondary={(i) => fmtPct(i.value / (k.atual.liquido || 1))} />
             </Panel>
           </div>
 
           <div className="mt-3 grid gap-3 lg:grid-cols-2">
             <Panel
-              title="Top 10 clientes"
-              subtitle={`Os 10 maiores concentram ${fmtPct(a.concentracaoTop10)} do faturamento (${fmtInt(a.totalClientes)} clientes no período)`}
+              title={f.topCustomers}
+              subtitle={f.topCustomersSub(fmtPct(a.concentracaoTop10), fmtInt(a.totalClientes))}
             >
               <Table
                 minWidth={480}
                 head={
                   <>
                     <th className={th}>#</th>
-                    <th className={th}>Cliente</th>
-                    <th className={`${th} text-right`}>Faturamento</th>
-                    <th className={`${th} text-right`}>Participação</th>
-                    <th className={`${th} text-right`}>Acumulado</th>
+                    <th className={th}>{f.cols.customer}</th>
+                    <th className={`${th} text-right`}>{f.cols.revenue}</th>
+                    <th className={`${th} text-right`}>{f.cols.share}</th>
+                    <th className={`${th} text-right`}>{f.cols.cumulative}</th>
                   </>
                 }
               >
@@ -149,32 +169,32 @@ export default async function FaturamentoPage({ searchParams }: PageProps<"/demo
               </Table>
             </Panel>
             <div className="grid gap-3">
-              <Panel title="Ranking de vendedores" subtitle="Faturamento líquido · notas emitidas">
+              <Panel title={f.sellers} subtitle={f.sellersSub}>
                 <BarList
                   items={a.vendedores.slice(0, 8)}
                   format={fmtMoneyShort}
                   color="bg-series-3"
-                  secondary={(i) => `${a.vendedores.find((v) => v.name === i.name)?.notas ?? 0} NFs`}
+                  secondary={(i) => f.nfs(a.vendedores.find((v) => v.name === i.name)?.notas ?? 0)}
                 />
               </Panel>
             </div>
           </div>
 
           <div className="mt-3 grid gap-3 lg:grid-cols-[1fr_1.4fr]">
-            <Panel title="Produtos mais vendidos" subtitle="Por faturamento líquido">
-              <BarList items={a.produtos} format={fmtMoneyShort} />
+            <Panel title={f.products} subtitle={f.productsSub}>
+              <BarList items={a.produtos.map((p) => ({ ...p, name: translateProduct(lang, p.name) }))} format={fmtMoneyShort} />
             </Panel>
-            <Panel title="Notas do período" subtitle="Mais recentes primeiro">
+            <Panel title={f.invoices} subtitle={f.invoicesSub}>
               <div id="notas" className="scroll-mt-32" />
               <Table
                 minWidth={520}
                 head={
                   <>
-                    <th className={th}>Nota</th>
-                    <th className={th}>Emissão</th>
-                    <th className={th}>Cliente</th>
-                    <th className={th}>Tipo</th>
-                    <th className={`${th} text-right`}>Valor</th>
+                    <th className={th}>{f.cols.invoice}</th>
+                    <th className={th}>{f.cols.issued}</th>
+                    <th className={th}>{f.cols.customer}</th>
+                    <th className={th}>{f.cols.type}</th>
+                    <th className={`${th} text-right`}>{f.cols.value}</th>
                   </>
                 }
               >
@@ -184,7 +204,7 @@ export default async function FaturamentoPage({ searchParams }: PageProps<"/demo
                     <td className={td}>{fmtDate(n.data)}</td>
                     <td className={`${td} max-w-[220px] truncate`}>{n.cliente}</td>
                     <td className={td}>
-                      <Badge tone={n.tipo === "Devolução" ? "warning" : "neutral"}>{n.tipo}</Badge>
+                      <Badge tone={n.tipo === "Devolução" ? "warning" : "neutral"}>{tv(n.tipo)}</Badge>
                     </td>
                     <td className={`${td} text-right ${n.tipo === "Devolução" ? "text-critical" : ""}`}>
                       {n.tipo === "Devolução" ? "−" : ""}
@@ -193,7 +213,7 @@ export default async function FaturamentoPage({ searchParams }: PageProps<"/demo
                   </tr>
                 ))}
               </Table>
-              <Pagination base="/demo/faturamento" params={params} page={pagina.page} pages={pagina.pages} total={pagina.total} anchor="#notas" />
+              <Pagination base={localePath(lang, "/demo/faturamento")} params={params} page={pagina.page} pages={pagina.pages} total={pagina.total} anchor="#notas" />
             </Panel>
           </div>
         </>

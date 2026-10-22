@@ -3,48 +3,58 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Check } from "lucide-react";
 import { Badge, Panel, Table, td, th } from "@/components/ui/dashboard";
+import { hasLocale, localePath, type Locale } from "@/i18n/config";
+import { translateProduct, translateValue, valueTranslator } from "@/i18n/data";
+import { getDictionary } from "@/i18n/dictionaries";
 import { STATUS_TONE } from "@/lib/analytics/compras";
 import { getCompraDetalhe, getComprasDataset } from "@/lib/data/repository";
-import { fmtDate, fmtInt, fmtMoney, fmtMoneyCents, fmtPct } from "@/lib/format";
+import { formatters } from "@/lib/format";
 
-export async function generateMetadata({ params }: PageProps<"/demo/compras/[numero]">): Promise<Metadata> {
-  return { title: `${decodeURIComponent((await params).numero)} — Compras 360` };
+export async function generateMetadata({ params }: PageProps<"/[lang]/demo/compras/[numero]">): Promise<Metadata> {
+  const { lang, numero } = await params;
+  const title = hasLocale(lang) ? getDictionary(lang).compras.title : "Compras 360";
+  return { title: `${decodeURIComponent(numero)} — ${title}` };
 }
 
-export default async function CompraDetalhePage({ params }: PageProps<"/demo/compras/[numero]">) {
-  const numero = decodeURIComponent((await params).numero);
+export default async function CompraDetalhePage({ params }: PageProps<"/[lang]/demo/compras/[numero]">) {
+  const { lang, numero: raw } = await params;
+  if (!hasLocale(lang)) notFound();
+  const t = getDictionary(lang).compras.detail;
+  const tv = valueTranslator(lang);
+  const { fmtDate, fmtMoney, fmtMoneyCents, fmtPct } = formatters(lang);
+  const numero = decodeURIComponent(raw);
   const { data } = await getComprasDataset();
   const p = data.processos.find((r) => r.sc_numero === numero);
   if (!p) notFound();
   const det = await getCompraDetalhe(p.sc_numero, p.pc_numero);
 
   const passos = [
-    { titulo: "Solicitação", data: p.sc_data, detalhe: p.sc_numero, dias: null as number | null },
-    { titulo: "Aprovação", data: p.data_aprovacao, detalhe: p.data_aprovacao ? "Aprovada" : p.sc_status, dias: p.dias_aprovacao },
-    { titulo: "Pedido de compra", data: p.pc_data, detalhe: p.pc_numero ?? "—", dias: p.dias_ate_pedido },
-    { titulo: "Nota fiscal", data: p.nf_primeira_data, detalhe: p.nf_qtd ? `${p.nf_qtd} nota(s)` : "—", dias: p.dias_ate_nota },
+    { titulo: t.steps.request, data: p.sc_data, detalhe: p.sc_numero, dias: null as number | null },
+    { titulo: t.steps.approval, data: p.data_aprovacao, detalhe: p.data_aprovacao ? t.approved : tv(p.sc_status), dias: p.dias_aprovacao },
+    { titulo: t.steps.order, data: p.pc_data, detalhe: p.pc_numero ?? "—", dias: p.dias_ate_pedido },
+    { titulo: t.steps.invoice, data: p.nf_primeira_data, detalhe: p.nf_qtd ? t.invoices(p.nf_qtd) : "—", dias: p.dias_ate_nota },
   ];
   const interrompido = p.sc_status === "Reprovada" || p.sc_status === "Cancelada";
   const diferenca = p.pc_valor !== null ? p.pc_valor - p.sc_valor_estimado : null;
 
   return (
     <>
-      <Link href="/demo/compras" className="inline-flex items-center gap-1.5 text-sm text-ink-2 hover:text-ink">
-        <ArrowLeft className="h-4 w-4" /> Voltar ao painel
+      <Link href={localePath(lang, "/demo/compras")} className="inline-flex items-center gap-1.5 text-sm text-ink-2 hover:text-ink">
+        <ArrowLeft className="h-4 w-4" /> {getDictionary(lang).demo.backToPanel}
       </Link>
 
       <div className="mt-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
         <div>
-          <p className="font-mono text-xs text-muted">processo de compra</p>
+          <p className="font-mono text-xs text-muted">{t.eyebrow}</p>
           <h1 className="mt-1 font-mono text-2xl font-semibold">{p.sc_numero}</h1>
           <p className="mt-1 text-sm text-ink-2">
-            {p.categoria} · {p.centro_custo} · solicitado por {p.solicitante}
+            {tv(p.categoria)} · {tv(p.centro_custo)} · {t.requestedBy} {p.solicitante}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Badge tone={STATUS_TONE[p.sc_status]}>{p.sc_status}</Badge>
+          <Badge tone={STATUS_TONE[p.sc_status]}>{tv(p.sc_status)}</Badge>
           <Badge tone={p.prioridade === "Urgente" ? "critical" : p.prioridade === "Alta" ? "warning" : "neutral"}>
-            Prioridade {p.prioridade.toLowerCase()}
+            {t.priority(tv(p.prioridade))}
           </Badge>
         </div>
       </div>
@@ -65,11 +75,11 @@ export default async function CompraDetalhePage({ params }: PageProps<"/demo/com
                 </span>
                 <span className="text-sm font-semibold">{s.titulo}</span>
               </div>
-              <p className="mt-2 text-sm">{feito ? fmtDate(s.data) : interrompido && i > 0 ? "Interrompido" : "Pendente"}</p>
+              <p className="mt-2 text-sm">{feito ? fmtDate(s.data) : interrompido && i > 0 ? t.interrupted : t.pending}</p>
               <p className="font-mono text-xs text-muted">{s.detalhe}</p>
               {s.dias !== null && (
                 <p className="mt-2 inline-block rounded bg-wash px-1.5 py-0.5 text-[11px] text-ink-2">
-                  +{s.dias} d desde a etapa anterior
+                  {t.sincePrevious(s.dias)}
                 </p>
               )}
             </li>
@@ -78,39 +88,39 @@ export default async function CompraDetalhePage({ params }: PageProps<"/demo/com
       </ol>
 
       <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Info label="Valor estimado" value={fmtMoney(p.sc_valor_estimado)} />
+        <Info label={t.estimated} value={fmtMoney(p.sc_valor_estimado)} />
         <Info
-          label="Valor do pedido"
+          label={t.orderValue}
           value={p.pc_valor !== null ? fmtMoney(p.pc_valor) : "—"}
-          sub={diferenca !== null ? `${diferenca <= 0 ? "economia" : "acima"} de ${fmtMoney(Math.abs(diferenca))} (${fmtPct(Math.abs(diferenca) / p.sc_valor_estimado)})` : undefined}
+          sub={diferenca !== null ? t.diff(diferenca <= 0, fmtMoney(Math.abs(diferenca)), fmtPct(Math.abs(diferenca) / p.sc_valor_estimado)) : undefined}
         />
-        <Info label="Fornecedor" value={p.fornecedor ?? "—"} sub={p.comprador ? `Comprador: ${p.comprador}` : undefined} />
+        <Info label={t.supplier} value={p.fornecedor ?? "—"} sub={p.comprador ? t.buyer(p.comprador) : undefined} />
         <Info
-          label="Ciclo total"
-          value={p.dias_total !== null ? `${p.dias_total} dias` : "Em andamento"}
-          sub={p.pc_prevista ? `Entrega prevista: ${fmtDate(p.pc_prevista)}` : undefined}
+          label={t.cycle}
+          value={p.dias_total !== null ? t.days(p.dias_total) : t.inProgress}
+          sub={p.pc_prevista ? t.expected(fmtDate(p.pc_prevista)) : undefined}
         />
       </div>
 
       <div className="mt-3 grid gap-3 xl:grid-cols-2">
-        <Panel title="Itens solicitados" subtitle={p.sc_numero}>
-          <ItensTable itens={det.itensSolicitacao} />
+        <Panel title={t.requestItems} subtitle={p.sc_numero}>
+          <ItensTable lang={lang} itens={det.itensSolicitacao} />
         </Panel>
-        <Panel title="Itens do pedido" subtitle={p.pc_numero ?? "Pedido ainda não emitido"}>
-          {det.itensPedido.length ? <ItensTable itens={det.itensPedido} /> : <p className="text-sm text-muted">Sem pedido vinculado.</p>}
+        <Panel title={t.orderItems} subtitle={p.pc_numero ?? t.noOrderYet}>
+          {det.itensPedido.length ? <ItensTable lang={lang} itens={det.itensPedido} /> : <p className="text-sm text-muted">{t.noOrder}</p>}
         </Panel>
       </div>
 
-      <Panel title="Notas fiscais recebidas" className="mt-3">
+      <Panel title={t.invoicesPanel} className="mt-3">
         {det.notas.length ? (
           <Table
             head={
               <>
-                <th className={th}>Número</th>
-                <th className={th}>Série</th>
-                <th className={th}>Emissão</th>
-                <th className={th}>Recebimento</th>
-                <th className={`${th} text-right`}>Valor</th>
+                <th className={th}>{t.cols.number}</th>
+                <th className={th}>{t.cols.series}</th>
+                <th className={th}>{t.cols.issued}</th>
+                <th className={th}>{t.cols.received}</th>
+                <th className={`${th} text-right`}>{t.cols.value}</th>
               </>
             }
           >
@@ -125,7 +135,7 @@ export default async function CompraDetalhePage({ params }: PageProps<"/demo/com
             ))}
           </Table>
         ) : (
-          <p className="text-sm text-muted">Nenhuma nota fiscal recebida até o momento.</p>
+          <p className="text-sm text-muted">{t.noInvoices}</p>
         )}
       </Panel>
     </>
@@ -144,26 +154,34 @@ function Info({ label, value, sub }: { label: string; value: string; sub?: strin
   );
 }
 
-function ItensTable({ itens }: { itens: { produto_codigo: string; produto: string; unidade: string; quantidade: number; valor_unitario: number; valor_total: number }[] }) {
+function ItensTable({
+  lang,
+  itens,
+}: {
+  lang: Locale;
+  itens: { produto_codigo: string; produto: string; unidade: string; quantidade: number; valor_unitario: number; valor_total: number }[];
+}) {
+  const t = getDictionary(lang).compras.detail.cols;
+  const { fmtInt, fmtMoneyCents } = formatters(lang);
   return (
     <Table
       minWidth={480}
       head={
         <>
-          <th className={th}>Código</th>
-          <th className={th}>Produto</th>
-          <th className={`${th} text-right`}>Qtd.</th>
-          <th className={`${th} text-right`}>Unitário</th>
-          <th className={`${th} text-right`}>Total</th>
+          <th className={th}>{t.code}</th>
+          <th className={th}>{t.product}</th>
+          <th className={`${th} text-right`}>{t.qty}</th>
+          <th className={`${th} text-right`}>{t.unit}</th>
+          <th className={`${th} text-right`}>{t.total}</th>
         </>
       }
     >
       {itens.map((i) => (
         <tr key={i.produto_codigo}>
           <td className={`${td} font-mono text-xs`}>{i.produto_codigo}</td>
-          <td className={td}>{i.produto}</td>
+          <td className={td}>{translateProduct(lang, i.produto)}</td>
           <td className={`${td} text-right`}>
-            {fmtInt(i.quantidade)} {i.unidade}
+            {fmtInt(i.quantidade)} {translateValue(lang, i.unidade)}
           </td>
           <td className={`${td} text-right`}>{fmtMoneyCents(i.valor_unitario)}</td>
           <td className={`${td} text-right`}>{fmtMoneyCents(i.valor_total)}</td>

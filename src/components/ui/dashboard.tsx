@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ArrowDownRight, ArrowUpRight, ChevronLeft, ChevronRight, Minus } from "lucide-react";
-import { fmtPct } from "@/lib/format";
+import { getDictionary } from "@/i18n/dictionaries";
+import { currentLocale } from "@/i18n/server";
+import { formatters } from "@/lib/format";
 
 /* ------------------------------------------------------------------ */
 /* KPI                                                                 */
@@ -10,7 +12,7 @@ export function Kpi({
   value,
   hint,
   delta,
-  deltaLabel = "vs. ano anterior",
+  deltaLabel,
   invert = false,
   tone,
 }: {
@@ -41,7 +43,8 @@ export function Kpi({
   );
 }
 
-export function Delta({
+/** Variação percentual; sem `label` explícito e fora do modo inline, compara com o ano anterior. */
+export async function Delta({
   value,
   label,
   invert = false,
@@ -52,10 +55,14 @@ export function Delta({
   invert?: boolean;
   inline?: boolean;
 }) {
+  const lang = await currentLocale();
+  const t = getDictionary(lang).ui;
+  const { fmtPct } = formatters(lang);
   const Tag = inline ? "span" : "p";
   if (value === null || !Number.isFinite(value)) {
-    return <Tag className={`${inline ? "" : "mt-1"} text-xs text-muted`}>{inline ? "—" : "sem base de comparação"}</Tag>;
+    return <Tag className={`${inline ? "" : "mt-1"} text-xs text-muted`}>{inline ? "—" : t.noBaseline}</Tag>;
   }
+  if (label === undefined && !inline) label = t.vsLastYear;
   const up = value > 0.0005;
   const down = value < -0.0005;
   const good = invert ? down : up;
@@ -196,7 +203,7 @@ export function hrefWith(base: string, params: Record<string, string>, changes: 
   return s ? `${base}?${s}` : base;
 }
 
-export function Pagination({
+export async function Pagination({
   base,
   params,
   page,
@@ -211,30 +218,32 @@ export function Pagination({
   total: number;
   anchor?: string;
 }) {
+  const lang = await currentLocale();
+  const t = getDictionary(lang).ui;
   const link = (p: number) => `${hrefWith(base, params, { pagina: p > 1 ? String(p) : null })}${anchor}`;
   const btn = "inline-flex h-8 items-center gap-1 rounded border border-line bg-surface px-2.5 text-xs transition-colors hover:border-ink";
   return (
-    <nav className="mt-4 flex items-center justify-between text-xs text-ink-2" aria-label="Paginação">
+    <nav className="mt-4 flex items-center justify-between text-xs text-ink-2" aria-label={t.pagination}>
       <span className="tabular">
-        {total.toLocaleString("pt-BR")} registros · página {page} de {pages}
+        {t.records(formatters(lang).fmtInt(total), page, pages)}
       </span>
       <span className="flex gap-2">
         {page > 1 ? (
           <Link href={link(page - 1)} className={btn} scroll={false}>
-            <ChevronLeft className="h-3.5 w-3.5" /> Anterior
+            <ChevronLeft className="h-3.5 w-3.5" /> {t.previous}
           </Link>
         ) : (
           <span className={`${btn} opacity-40`}>
-            <ChevronLeft className="h-3.5 w-3.5" /> Anterior
+            <ChevronLeft className="h-3.5 w-3.5" /> {t.previous}
           </span>
         )}
         {page < pages ? (
           <Link href={link(page + 1)} className={btn} scroll={false}>
-            Próxima <ChevronRight className="h-3.5 w-3.5" />
+            {t.next} <ChevronRight className="h-3.5 w-3.5" />
           </Link>
         ) : (
           <span className={`${btn} opacity-40`}>
-            Próxima <ChevronRight className="h-3.5 w-3.5" />
+            {t.next} <ChevronRight className="h-3.5 w-3.5" />
           </span>
         )}
       </span>

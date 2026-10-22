@@ -1,6 +1,10 @@
-export default function Loading() {
+import { getDictionary } from "@/i18n/dictionaries";
+import { currentLocale } from "@/i18n/server";
+
+export default async function Loading() {
+  const t = getDictionary(await currentLocale()).demo;
   return (
-    <div aria-busy="true" aria-label="Carregando" className="animate-pulse">
+    <div aria-busy="true" aria-label={t.loading} className="animate-pulse">
       <div className="h-7 w-56 rounded bg-line" />
       <div className="mt-2 h-4 w-96 max-w-full rounded bg-wash" />
       <div className="mt-5 h-16 rounded-lg bg-wash" />

@@ -4,61 +4,59 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { SiteFooter, SiteHeader } from "@/components/site/SiteHeader";
 import { DemoNotice } from "@/components/ui/DemoNotice";
-import { cases, getCase } from "@/content/cases";
+import { getCase, getCases } from "@/content/cases";
+import { defaultLocale, hasLocale, localePath } from "@/i18n/config";
+import { getDictionary } from "@/i18n/dictionaries";
 
 export function generateStaticParams() {
-  return cases.map((c) => ({ slug: c.slug }));
+  return getCases(defaultLocale).map((c) => ({ slug: c.slug }));
 }
 
-export async function generateMetadata({ params }: PageProps<"/cases/[slug]">): Promise<Metadata> {
-  const c = getCase((await params).slug);
+export async function generateMetadata({ params }: PageProps<"/[lang]/cases/[slug]">): Promise<Metadata> {
+  const { lang, slug } = await params;
+  const c = hasLocale(lang) ? getCase(lang, slug) : undefined;
   return c ? { title: c.name, description: c.tagline } : {};
 }
 
-const ARQUITETURA = [
-  { t: "Dados sintéticos", d: "Gerador determinístico em TypeScript produz os seeds SQL." },
-  { t: "PostgreSQL (Supabase)", d: "Schema próprio por domínio, chaves, índices e RLS somente leitura." },
-  { t: "Views analíticas", d: "Views públicas expõem o modelo pronto para consumo." },
-  { t: "Next.js (servidor)", d: "Consulta as views, aplica filtros e calcula indicadores." },
-  { t: "Interface", d: "Gráficos e tabelas responsivos, sem exigir conhecimento técnico." },
-];
-
-export default async function CasePage({ params }: PageProps<"/cases/[slug]">) {
-  const c = getCase((await params).slug);
+export default async function CasePage({ params }: PageProps<"/[lang]/cases/[slug]">) {
+  const { lang, slug } = await params;
+  if (!hasLocale(lang)) notFound();
+  const c = getCase(lang, slug);
   if (!c) notFound();
+  const t = getDictionary(lang).casePage;
 
   return (
     <>
-      <SiteHeader />
+      <SiteHeader lang={lang} />
       <main className="flex-1">
         <section className="blueprint border-b border-line">
           <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6">
-            <Link href="/#cases" className="inline-flex items-center gap-1.5 text-sm text-ink-2 hover:text-ink">
-              <ArrowLeft className="h-4 w-4" /> Todos os cases
+            <Link href={localePath(lang, "/#cases")} className="inline-flex items-center gap-1.5 text-sm text-ink-2 hover:text-ink">
+              <ArrowLeft className="h-4 w-4" /> {t.allCases}
             </Link>
             <p className="mt-8 font-mono text-xs text-muted">case / {c.index}</p>
             <h1 className="mt-2 text-4xl font-semibold tracking-tight sm:text-5xl">{c.name}</h1>
             <p className="mt-4 max-w-2xl text-lg text-ink-2">{c.tagline}</p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
-                href={c.demoHref}
+                href={localePath(lang, c.demoHref)}
                 className="inline-flex items-center gap-2 rounded-md bg-ink px-5 py-2.5 text-sm font-medium text-surface transition-colors hover:bg-accent-strong"
               >
-                Abrir demonstração <ArrowUpRight className="h-4 w-4" />
+                {t.openDemo} <ArrowUpRight className="h-4 w-4" />
               </Link>
-              <DemoNotice compact />
+              <DemoNotice lang={lang} compact />
             </div>
           </div>
         </section>
 
         <section className="mx-auto grid max-w-5xl gap-px overflow-hidden px-4 py-14 sm:px-6 md:grid-cols-3 md:gap-8">
-          <Block n="01" title="O problema">
+          <Block n="01" title={t.problem}>
             <p>{c.problem}</p>
           </Block>
-          <Block n="02" title="A solução">
+          <Block n="02" title={t.solution}>
             <p>{c.solution}</p>
           </Block>
-          <Block n="03" title="O resultado">
+          <Block n="03" title={t.outcome}>
             <ul className="space-y-2">
               {c.outcome.map((o) => (
                 <li key={o} className="flex gap-2">
@@ -73,7 +71,7 @@ export default async function CasePage({ params }: PageProps<"/cases/[slug]">) {
         <section className="border-y border-line bg-surface">
           <div className="mx-auto grid max-w-5xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-2">
             <div>
-              <H2>Funcionalidades</H2>
+              <H2>{t.features}</H2>
               <ul className="mt-4 divide-y divide-line rounded-lg border border-line bg-page">
                 {c.features.map((f) => (
                   <li key={f} className="px-4 py-2.5 text-sm">
@@ -83,8 +81,8 @@ export default async function CasePage({ params }: PageProps<"/cases/[slug]">) {
               </ul>
             </div>
             <div>
-              <H2>Modelo de dados</H2>
-              <p className="mt-2 text-sm text-ink-2">Entidades principais do banco desta demonstração:</p>
+              <H2>{t.dataModel}</H2>
+              <p className="mt-2 text-sm text-ink-2">{t.dataModelText}</p>
               <div className="mt-4 flex flex-wrap gap-2">
                 {c.entities.map((e) => (
                   <span key={e} className="rounded border border-line bg-page px-2.5 py-1 font-mono text-xs">
@@ -99,12 +97,12 @@ export default async function CasePage({ params }: PageProps<"/cases/[slug]">) {
         </section>
 
         <section className="mx-auto max-w-5xl px-4 py-14 sm:px-6">
-          <H2>Arquitetura da demonstração</H2>
+          <H2>{t.architecture}</H2>
           <p className="mt-2 max-w-2xl text-sm text-ink-2">
-            Detalhe técnico para quem quiser ir além: como os dados percorrem a aplicação.
+            {t.architectureText}
           </p>
           <ol className="mt-6 grid gap-3 md:grid-cols-5">
-            {ARQUITETURA.map((a, i) => (
+            {t.architectureSteps.map((a, i) => (
               <li key={a.t} className="relative rounded-lg border border-line bg-surface p-4">
                 <p className="font-mono text-[11px] text-muted">{String(i + 1).padStart(2, "0")}</p>
                 <p className="mt-1 text-sm font-semibold">{a.t}</p>
@@ -114,7 +112,7 @@ export default async function CasePage({ params }: PageProps<"/cases/[slug]">) {
           </ol>
         </section>
       </main>
-      <SiteFooter />
+      <SiteFooter lang={lang} />
     </>
   );
 }
