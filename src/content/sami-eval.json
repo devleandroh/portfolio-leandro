@@ -1,0 +1,95 @@
+{
+  "generatedAt": "2026-10-27T18:28:07.598Z",
+  "environment": "Node.js v24.14.1 · win32",
+  "cases": 40,
+  "mechanism": {
+    "correct": 40,
+    "total": 40
+  },
+  "records": {
+    "found": 88,
+    "expected": 88,
+    "relevant": 88,
+    "returned": 88
+  },
+  "docs": {
+    "found": 21,
+    "expected": 22,
+    "relevant": 21,
+    "returned": 26
+  },
+  "refusals": {
+    "correct": 8,
+    "total": 8
+  },
+  "falseRefusals": {
+    "count": 0,
+    "total": 32
+  },
+  "references": {
+    "valid": 406,
+    "total": 406
+  },
+  "failures": [
+    {
+      "lang": "pt",
+      "q": "Por que a T-05 está bloqueada?",
+      "expected": "hybrid",
+      "got": "hybrid",
+      "ok": true,
+      "missingRecords": [],
+      "extraRecords": [],
+      "missingDocs": [],
+      "extraDocs": [
+        "ADR-002",
+        "SCH-002"
+      ]
+    },
+    {
+      "lang": "en",
+      "q": "Why is T-05 blocked?",
+      "expected": "hybrid",
+      "got": "hybrid",
+      "ok": true,
+      "missingRecords": [],
+      "extraRecords": [],
+      "missingDocs": [],
+      "extraDocs": [
+        "ADR-002",
+        "SCH-002"
+      ]
+    },
+    {
+      "lang": "en",
+      "q": "Where is the ERP call limit documented?",
+      "expected": "retrieval",
+      "got": "retrieval",
+      "ok": true,
+      "missingRecords": [],
+      "extraRecords": [],
+      "missingDocs": [],
+      "extraDocs": [
+        "TEC-003"
+      ]
+    },
+    {
+      "lang": "en",
+      "q": "How does SSO authentication work?",
+      "expected": "retrieval",
+      "got": "retrieval",
+      "ok": true,
+      "missingRecords": [],
+      "extraRecords": [],
+      "missingDocs": [
+        "REQ-001"
+      ],
+      "extraDocs": []
+    }
+  ],
+  "latencyMs": {
+    "p50": 0.518,
+    "p95": 1.451,
+    "max": 3.378,
+    "runs": 800
+  }
+}

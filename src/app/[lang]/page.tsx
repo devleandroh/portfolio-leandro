@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ArrowRight, ArrowUpRight, Database, LayoutDashboard, Workflow, AppWindow } from "lucide-react";
 import { PipelineDiagram } from "@/components/site/PipelineDiagram";
 import { ProfileIntro } from "@/components/site/ProfileIntro";
+import { SamiFeature } from "@/components/sami/SamiFeature";
 import { SiteFooter, SiteHeader } from "@/components/site/SiteHeader";
 import { contactLinks, getProfile } from "@/config/profile";
 import { getCases } from "@/content/cases";
@@ -110,6 +111,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
               </p>
             </div>
             <div className="mt-10 space-y-6">
+              <SamiFeature lang={lang} />
               {cases.map((c) => (
                 <article
                   key={c.slug}

@@ -11,6 +11,7 @@
     "test": "vitest run",
     "db:seeds": "tsx scripts/generate-seeds.ts",
     "db:verify": "tsx scripts/verify-db.ts",
+    "sami:eval": "tsx scripts/sami-eval.ts",
     "check": "npm run lint && npm run typecheck && npm test && npm run db:verify && npm run build",
     "db:verify-remote": "tsx --env-file=.env.local scripts/verify-remote.ts"
   },

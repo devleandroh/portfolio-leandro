@@ -1,10 +1,12 @@
 import type { Locale } from "./config";
+import { samiEn, samiPt } from "./sami";
 
 /**
  * Textos da interface por idioma. O português é a referência: o inglês precisa
  * ter exatamente as mesmas chaves (o TypeScript acusa qualquer chave faltando).
  */
 const pt = {
+  sami: samiPt,
   meta: {
     demoSuffix: "demonstração",
   },
@@ -84,7 +86,7 @@ const pt = {
     cases: {
       eyebrow: "Cases",
       title: "Projetos com demonstração funcional.",
-      text: "Cada case abre uma aplicação real, rodando sobre um banco PostgreSQL com dados 100% fictícios.",
+      text: "Cada case abre uma aplicação real com dados 100% fictícios — as três demos de dados rodam sobre PostgreSQL.",
       openDemo: "Ver demonstração",
       details: "Detalhes do case",
       problem: "Problema",
@@ -404,6 +406,7 @@ const pt = {
 export type Dictionary = typeof pt;
 
 const en: Dictionary = {
+  sami: samiEn,
   meta: {
     demoSuffix: "demo",
   },
@@ -483,7 +486,7 @@ const en: Dictionary = {
     cases: {
       eyebrow: "Cases",
       title: "Projects with working demos.",
-      text: "Each case opens a real application, running on a PostgreSQL database with 100% fictitious data.",
+      text: "Each case opens a real application with 100% fictitious data — the three data demos run on PostgreSQL.",
       openDemo: "See demo",
       details: "Case details",
       problem: "Problem",

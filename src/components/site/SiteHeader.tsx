@@ -17,6 +17,7 @@ export function Monogram({ className = "" }: { className?: string }) {
 export function SiteHeader({ lang }: { lang: Locale }) {
   const t = getDictionary(lang);
   const nav = [
+    { href: "/sami", label: t.sami.nav },
     { href: "/#cases", label: t.header.nav.cases },
     { href: "/#competencias", label: t.header.nav.skills },
     { href: "/#stack", label: t.header.nav.stack },

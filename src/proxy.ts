@@ -34,6 +34,6 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Ignora arquivos internos, a pasta public/ e os arquivos de metadados (ícone, imagem OG).
-  matcher: ["/((?!_next/|images/|icon\\.svg|favicon\\.ico|robots\\.txt|sitemap\\.xml).*)"],
+  // Ignora arquivos internos, a API (sem idioma na URL), a pasta public/ e os arquivos de metadados.
+  matcher: ["/((?!_next/|api/|images/|icon\\.svg|favicon\\.ico|robots\\.txt|sitemap\\.xml).*)"],
 };

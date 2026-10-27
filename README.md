@@ -7,6 +7,7 @@ Portfólio técnico pessoal com **três demonstrações funcionais** de aplicaç
 | **Compras 360** | `/demo/compras` | Ciclo Solicitação → Pedido → Nota fiscal, tempos entre etapas, funil, atrasos e detalhe do processo |
 | **Dashboard de Faturamento** | `/demo/faturamento` | Faturamento líquido, ticket médio, devoluções, comparação ano contra ano, rankings |
 | **Legal BI** | `/demo/juridico` | Carteira de processos, risco, valores, tribunais, aging, agenda de prazos e ficha do processo |
+| **S.A.M.I.** | `/sami` (EN) · `/pt/sami` (PT) | Assistente de IA: consultas estruturadas, RAG com BM25 e citações, arquitetura completa — ver [abaixo](#case-sami) |
 
 > **Todos os dados são 100% sintéticos**, gerados por um algoritmo determinístico deste repositório.
 > Nomes de pessoas e empresas são combinações aleatórias; qualquer semelhança com a realidade é coincidência.
@@ -94,6 +95,7 @@ Para ler do banco, configure o Supabase (abaixo) e crie o `.env.local`.
 | `npm test` | testes unitários (gerador e indicadores) |
 | `npm run db:seeds` | regenera `supabase/seed/*.sql` |
 | `npm run db:verify` | aplica migrations + seeds em um Postgres embarcado e compara com o gerador |
+| `npm run sami:eval` | avalia o motor da S.A.M.I. e atualiza as métricas exibidas na página |
 | `npm run db:verify-remote` | valida o Supabase remoto com a chave pública (lê `.env.local`): views, volumes, conteúdo, ausência de dados pessoais, bloqueio de escrita e consultas do frontend |
 | `npm run check` | tudo acima em sequência |
 
@@ -143,6 +145,33 @@ npx supabase db push --include-seed
 
 Veja **[DEPLOY.md](./DEPLOY.md)** — criação do Supabase, migrations, seeds, Vercel, variáveis,
 GitHub → Vercel, primeiro deploy e domínio.
+
+## Case S.A.M.I.
+
+Vitrine técnica do assistente pessoal **S.A.M.I. (Symbiotic Artificial Machine Intelligence)**. A página
+responde perguntas sobre um projeto fictício (**Projeto Atlas — Modernização de Compras**) **sem modelo
+generativo**: nada depende de Ollama, chaves de API ou serviços pagos, e o Supabase não é usado.
+
+```
+pergunta ─► POST /api/sami ─► roteador por regras ─┬─► consulta estruturada (projects.ts) ─┐
+            (validação, limite por IP)             └─► BM25 sobre trechos (retrieval.ts) ──┴─► resposta + fontes + rastro
+```
+
+| Arquivo | Responsabilidade |
+|---|---|
+| `src/lib/sami/atlas.ts` | **fonte única** de projetos, tarefas, marcos, riscos e decisões (painel e chat leem daqui) |
+| `src/lib/sami/documents.ts` | base documental fictícia (atas, ADRs, incidentes…) dividida em trechos citáveis |
+| `src/lib/sami/projects.ts` | atrasos, bloqueios e causas-raiz, projeção do cronograma (caminho crítico), simulação de atraso |
+| `src/lib/sami/retrieval.ts` | BM25 com limiar de cobertura: sem evidência suficiente, não há resposta categórica |
+| `src/lib/sami/engine.ts` | roteamento de intenções, extração de entidades e composição das respostas |
+| `src/lib/sami/eval.ts` | casos de avaliação (PT/EN) e cálculo das métricas |
+| `src/i18n/sami.ts` | textos PT/EN da página e das respostas (incluídos em `getDictionary(lang).sami`) |
+| `src/app/api/sami/route.ts` | API somente leitura (fora do proxy de idioma) |
+| `src/app/[lang]/sami/` | página do case e páginas dos documentos (`/sami/docs/<ID>`) |
+
+- `npm run sami:eval` executa a avaliação e grava `src/content/sami-eval.json`, exibido na página.
+  O teste `tests/sami.test.ts` falha se o arquivo não corresponder ao motor atual.
+- Ollama, memória e Playwright aparecem no diagrama como componentes da **SAMI completa** e não rodam aqui.
 
 ## Como adicionar novos cases
 
