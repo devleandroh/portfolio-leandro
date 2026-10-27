@@ -144,7 +144,7 @@ const pt = {
   demo: {
     back: "Voltar ao portfólio",
     navAria: "Demonstrações",
-    nav: { compras: "Compras 360", faturamento: "Faturamento", juridico: "Legal BI" },
+    nav: { compras: "Fluxo Compras", faturamento: "Faturamento", juridico: "Legal BI" },
     sourceSupabase: "Dados lidos do banco PostgreSQL (Supabase).",
     sourceLocal: "Banco não configurado: dados gerados localmente pelo mesmo algoritmo dos seeds.",
     sourceLocalLabel: "dados locais",
@@ -162,7 +162,7 @@ const pt = {
     filters: { all: "Todos", allF: "Todas", search: "Buscar", apply: "Aplicar", clear: "Limpar", updating: "Atualizando" },
   },
   compras: {
-    title: "Compras 360",
+    title: "Fluxo Compras",
     description: "Acompanhamento do ciclo de compras: da solicitação ao pedido e ao recebimento da nota fiscal.",
     stages: ["Solicitação", "Pedido", "Nota fiscal", "Concluída"],
     filters: {
@@ -265,7 +265,7 @@ const pt = {
     },
   },
   faturamento: {
-    title: "Dashboard de Faturamento",
+    title: "Faturamento",
     metaTitle: "Faturamento",
     description:
       "Receita líquida, volume de notas, ticket médio e devoluções — sempre comparados ao mesmo período do ano anterior.",
@@ -544,7 +544,7 @@ const en: Dictionary = {
   demo: {
     back: "Back to portfolio",
     navAria: "Demos",
-    nav: { compras: "Procurement 360", faturamento: "Revenue", juridico: "Legal BI" },
+    nav: { compras: "Purchasing Flow", faturamento: "Billing", juridico: "Legal BI" },
     sourceSupabase: "Data read from the PostgreSQL database (Supabase).",
     sourceLocal: "Database not configured: data generated locally by the same algorithm as the seeds.",
     sourceLocalLabel: "local data",
@@ -562,7 +562,7 @@ const en: Dictionary = {
     filters: { all: "All", allF: "All", search: "Search", apply: "Apply", clear: "Clear", updating: "Updating" },
   },
   compras: {
-    title: "Procurement 360",
+    title: "Purchasing Flow",
     description: "Tracking the purchasing cycle: from purchase request to purchase order to invoice receipt.",
     stages: ["Request", "Order", "Invoice", "Completed"],
     filters: {
@@ -665,8 +665,8 @@ const en: Dictionary = {
     },
   },
   faturamento: {
-    title: "Revenue Dashboard",
-    metaTitle: "Revenue",
+    title: "Billing",
+    metaTitle: "Billing",
     description:
       "Net revenue, invoice volume, average ticket and returns — always compared with the same period last year.",
     filters: { period: "Period", region: "Region", category: "Category", segment: "Segment", seller: "Sales rep" },

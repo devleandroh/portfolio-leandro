@@ -4,8 +4,8 @@ Portfólio técnico pessoal com **três demonstrações funcionais** de aplicaç
 
 | Case | Demo | O que mostra |
 |---|---|---|
-| **Compras 360** | `/demo/compras` | Ciclo Solicitação → Pedido → Nota fiscal, tempos entre etapas, funil, atrasos e detalhe do processo |
-| **Dashboard de Faturamento** | `/demo/faturamento` | Faturamento líquido, ticket médio, devoluções, comparação ano contra ano, rankings |
+| **Fluxo Compras** | `/demo/compras` | Ciclo Solicitação → Pedido → Nota fiscal, tempos entre etapas, funil, atrasos e detalhe do processo |
+| **Faturamento** | `/demo/faturamento` | Faturamento líquido, ticket médio, devoluções, comparação ano contra ano, rankings |
 | **Legal BI** | `/demo/juridico` | Carteira de processos, risco, valores, tribunais, aging, agenda de prazos e ficha do processo |
 | **S.A.M.I.** | `/sami` (EN) · `/pt/sami` (PT) | Assistente de IA: consultas estruturadas, RAG com BM25 e citações, arquitetura completa — ver [abaixo](#case-sami) |
 

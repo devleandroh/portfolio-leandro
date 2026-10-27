@@ -24,7 +24,7 @@ const pt: CaseStudy[] = [
   {
     slug: "compras-360",
     index: "01",
-    name: "Compras 360",
+    name: "Fluxo Compras",
     tagline: "Visibilidade ponta a ponta do ciclo de compras: da solicitação à nota fiscal.",
     demoHref: "/demo/compras",
     problem:
@@ -50,7 +50,7 @@ const pt: CaseStudy[] = [
   {
     slug: "faturamento",
     index: "02",
-    name: "Dashboard de Faturamento",
+    name: "Faturamento",
     tagline: "Receita, ticket médio e devoluções com comparação automática entre períodos.",
     demoHref: "/demo/faturamento",
     problem:
@@ -105,7 +105,7 @@ const en: CaseStudy[] = [
   {
     slug: "compras-360",
     index: "01",
-    name: "Procurement 360",
+    name: "Purchasing Flow",
     tagline: "End-to-end visibility of the purchasing cycle: from purchase request to invoice.",
     demoHref: "/demo/compras",
     problem:
@@ -131,7 +131,7 @@ const en: CaseStudy[] = [
   {
     slug: "faturamento",
     index: "02",
-    name: "Revenue Dashboard",
+    name: "Billing",
     tagline: "Revenue, average ticket and returns with automatic period-over-period comparison.",
     demoHref: "/demo/faturamento",
     problem:

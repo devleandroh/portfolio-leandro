@@ -12,7 +12,7 @@ import { formatters } from "@/lib/format";
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/demo/compras/[numero]">): Promise<Metadata> {
   const { lang, numero } = await params;
-  const title = hasLocale(lang) ? getDictionary(lang).compras.title : "Compras 360";
+  const title = hasLocale(lang) ? getDictionary(lang).compras.title : "Fluxo Compras";
   return { title: `${decodeURIComponent(numero)} — ${title}` };
 }
 
