@@ -15,9 +15,11 @@ import { generateFaturamentoTables } from "../synthetic/faturamento";
 import { generateLegalTables } from "../synthetic/legal";
 import { anchorDate } from "../synthetic/random";
 import { buildComprasViews, buildFaturamentoViews, buildLegalViews } from "../synthetic/views";
+import bancoSnapshot from "@/content/banco-snapshot.json";
 import type {
-  ComprasDataset, DataSourceKind, FaturamentoDataset, ItemDocumentoCompra, LegalDataset,
-  MovimentacaoJuridica, NotaCompra,
+  BancoCarteiraMensal, BancoClientesMensal, BancoDataset, BancoExecucao, BancoMacroMensal, BancoPerfilRisco,
+  BancoQualidade, BancoTransacoesDiarias, ComprasDataset, DataSourceKind, FaturamentoDataset, ItemDocumentoCompra,
+  LegalDataset, MovimentacaoJuridica, NotaCompra,
 } from "./types";
 
 const CACHE_TTL_MS = 10 * 60 * 1000;
@@ -251,4 +253,64 @@ export async function getMovimentacoes(processoNumero: string): Promise<Moviment
         .sort((a, b) => b.data.localeCompare(a.data) || b.id - a.id),
   );
   return loaded.data;
+}
+
+// ---------------------------------------------------------------------
+// Banco 360 — marts carregados diariamente pelo pipeline PySpark
+// ---------------------------------------------------------------------
+/**
+ * Cópia local das views (exportada pelo pipeline com `python -m banco360 snapshot`),
+ * usada quando o Supabase não está configurado ou não responde.
+ */
+function bancoLocal(): BancoDataset {
+  const s = bancoSnapshot as unknown as Record<string, unknown[]>;
+  return {
+    carteira: s.carteira_mensal as BancoCarteiraMensal[],
+    perfil: s.perfil_risco as BancoPerfilRisco[],
+    transacoes: s.transacoes_diarias as BancoTransacoesDiarias[],
+    clientes: s.clientes_mensal as BancoClientesMensal[],
+    macro: s.macro_mensal as BancoMacroMensal[],
+    execucoes: s.execucoes as BancoExecucao[],
+    qualidade: s.qualidade as BancoQualidade[],
+  };
+}
+
+/** A data de referência do Banco 360 é a posição mais recente processada pelo pipeline. */
+function bancoHoje(d: BancoDataset): string {
+  return d.carteira.reduce((m, r) => (r.data_posicao > m ? r.data_posicao : m), "").slice(0, 10) || todayIso();
+}
+
+export function getBancoDataset(): Promise<Loaded<BancoDataset>> {
+  return cached("banco", async () => {
+    const loaded = await withFallback<BancoDataset>(
+      async (sb) => {
+        const [carteira, perfil, transacoes, clientes, macro, execucoes, qualidade] = await Promise.all([
+          fetchAll<BancoCarteiraMensal>(sb, "banco_v_carteira_mensal", "*", "ano_mes"),
+          fetchAll<BancoPerfilRisco>(sb, "banco_v_perfil_risco", "*", "segmento"),
+          fetchAll<BancoTransacoesDiarias>(sb, "banco_v_transacoes_diarias", "*", "data"),
+          fetchAll<BancoClientesMensal>(sb, "banco_v_clientes_mensal", "*", "ano_mes"),
+          fetchAll<BancoMacroMensal>(sb, "banco_v_macro_mensal", "*", "ano_mes"),
+          sb.from("banco_v_execucoes").select("*").order("inicio", { ascending: false }).limit(60),
+          sb.from("banco_v_qualidade").select("*").limit(500),
+        ]);
+        const err = execucoes.error ?? qualidade.error;
+        if (err) throw new Error(err.message);
+        if (!carteira.length) throw new Error("banco_v_carteira_mensal vazia — o pipeline ainda não carregou dados");
+        return {
+          carteira: numbers(carteira, [
+            "saldo_carteira", "saldo_estagio_1", "saldo_estagio_2", "saldo_estagio_3", "saldo_atraso_90",
+            "saldo_atraso_15_90", "provisao_estimada", "valor_concedido", "valor_x_taxa_concedido",
+          ]),
+          perfil: numbers(perfil, ["saldo_carteira", "saldo_atraso_90", "provisao_estimada"]),
+          transacoes: numbers(transacoes, ["valor_total", "valor_entrada", "valor_saida"]),
+          clientes: numbers(clientes, ["saldo_conta_corrente", "saldo_poupanca"]),
+          macro: numbers(macro, ["selic_meta", "dolar_medio", "ipca_mensal", "ipca_12m"]),
+          execucoes: numbers((execucoes.data ?? []) as BancoExecucao[], ["duracao_s"]),
+          qualidade: numbers((qualidade.data ?? []) as BancoQualidade[], ["observado"]),
+        };
+      },
+      bancoLocal,
+    );
+    return { ...loaded, today: bancoHoje(loaded.data) };
+  });
 }

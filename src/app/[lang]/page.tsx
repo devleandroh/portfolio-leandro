@@ -13,7 +13,7 @@ import { getDictionary } from "@/i18n/dictionaries";
 const SKILL_ICONS = [Database, LayoutDashboard, Workflow, AppWindow];
 
 const STACK = (excel: string) => ({
-  data: ["SQL", "PostgreSQL", "SQL Server", "Python", "pandas", excel],
+  data: ["SQL", "PostgreSQL", "SQL Server", "Python", "pandas", "PySpark", "Apache Airflow", "Parquet", excel],
   apps: ["TypeScript", "Next.js", "React", "Node.js", "Tailwind CSS", "Recharts"],
   platform: ["Supabase", "Vercel", "Git", "GitHub Actions", "Docker", "Linux"],
 });

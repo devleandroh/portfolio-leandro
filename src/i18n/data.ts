@@ -7,6 +7,31 @@ import type { Locale } from "./config";
  * (fictícios) não são traduzidos; valores sem tradução aparecem como estão.
  */
 const EN: Record<string, string> = {
+  // ---------- Banco 360 ----------
+  Essencial: "Essential",
+  "Crédito pessoal": "Personal loan",
+  Consignado: "Payroll-deducted loan",
+  "Financiamento de veículos": "Auto financing",
+  "Cartão parcelado": "Card installments",
+  "Crédito imobiliário": "Mortgage",
+  "Estágio 1": "Stage 1",
+  "Estágio 2": "Stage 2",
+  "Estágio 3": "Stage 3",
+  "Muito baixo": "Very low",
+  Baixo: "Low",
+  Médio: "Medium",
+  Alto: "High",
+  "Muito alto": "Very high",
+  "Até R$ 3 mil": "Up to R$3K",
+  "R$ 3 a 8 mil": "R$3K–8K",
+  "R$ 8 a 15 mil": "R$8K–15K",
+  "R$ 15 a 30 mil": "R$15K–30K",
+  "Acima de R$ 30 mil": "Above R$30K",
+  "Cartão de débito": "Debit card",
+  "Cartão de crédito": "Credit card",
+  Boleto: "Bank slip (boleto)",
+  TED: "Wire transfer (TED)",
+
   // ---------- Compras: centros de custo ----------
   Manutenção: "Maintenance",
   Produção: "Production",

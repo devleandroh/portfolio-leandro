@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { localePath, stripLocale, type Locale } from "@/i18n/config";
 
 const DEMOS = [
+  { href: "/demo/banco", key: "banco" },
   { href: "/demo/compras", key: "compras" },
   { href: "/demo/faturamento", key: "faturamento" },
   { href: "/demo/juridico", key: "juridico" },

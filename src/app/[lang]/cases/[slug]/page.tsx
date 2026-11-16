@@ -44,6 +44,16 @@ export default async function CasePage({ params }: PageProps<"/[lang]/cases/[slu
               >
                 {t.openDemo} <ArrowUpRight className="h-4 w-4" />
               </Link>
+              {c.repoHref && (
+                <a
+                  href={c.repoHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-md border border-axis bg-surface px-5 py-2.5 text-sm font-medium transition-colors hover:border-ink"
+                >
+                  GitHub <ArrowUpRight className="h-4 w-4" />
+                </a>
+              )}
               <DemoNotice lang={lang} compact />
             </div>
           </div>
@@ -101,8 +111,8 @@ export default async function CasePage({ params }: PageProps<"/[lang]/cases/[slu
           <p className="mt-2 max-w-2xl text-sm text-ink-2">
             {t.architectureText}
           </p>
-          <ol className="mt-6 grid gap-3 md:grid-cols-5">
-            {t.architectureSteps.map((a, i) => (
+          <ol className={`mt-6 grid gap-3 ${c.architecture ? "sm:grid-cols-2 lg:grid-cols-3" : "md:grid-cols-5"}`}>
+            {(c.architecture ?? t.architectureSteps).map((a, i) => (
               <li key={a.t} className="relative rounded-lg border border-line bg-surface p-4">
                 <p className="font-mono text-[11px] text-muted">{String(i + 1).padStart(2, "0")}</p>
                 <p className="mt-1 text-sm font-semibold">{a.t}</p>
@@ -110,6 +120,32 @@ export default async function CasePage({ params }: PageProps<"/[lang]/cases/[slu
               </li>
             ))}
           </ol>
+          {c.awsMap && (
+            <div className="mt-12">
+              <H2>{t.awsTitle}</H2>
+              <p className="mt-2 max-w-2xl text-sm text-ink-2">{t.awsText}</p>
+              <div className="mt-5 overflow-x-auto rounded-lg border border-line bg-surface">
+                <table className="w-full min-w-[560px] text-left text-sm">
+                  <thead className="border-b border-line bg-page text-xs text-muted">
+                    <tr>
+                      {t.awsCols.map((h) => (
+                        <th key={h} className="px-4 py-2 font-medium">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-line">
+                    {c.awsMap.map((m) => (
+                      <tr key={m.aws}>
+                        <td className="px-4 py-2.5">{m.local}</td>
+                        <td className="px-4 py-2.5 font-medium">{m.aws}</td>
+                        <td className="px-4 py-2.5 text-ink-2">{m.uso}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </section>
       </main>
       <SiteFooter lang={lang} />

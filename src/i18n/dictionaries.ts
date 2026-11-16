@@ -1,4 +1,5 @@
 import type { Locale } from "./config";
+import { bancoEn, bancoPt } from "./banco";
 import { samiEn, samiPt } from "./sami";
 
 /**
@@ -7,6 +8,7 @@ import { samiEn, samiPt } from "./sami";
  */
 const pt = {
   sami: samiPt,
+  banco: bancoPt,
   meta: {
     demoSuffix: "demonstração",
   },
@@ -127,6 +129,9 @@ const pt = {
     dataModelText: "Entidades principais do banco desta demonstração:",
     architecture: "Arquitetura da demonstração",
     architectureText: "Detalhe técnico para quem quiser ir além: como os dados percorrem a aplicação.",
+    awsTitle: "Equivalência com a AWS",
+    awsText: "A demonstração roda sem custo em Supabase e Vercel; o código foi escrito para migrar para a AWS trocando configuração.",
+    awsCols: ["Nesta demonstração", "Serviço AWS equivalente", "Papel"],
     architectureSteps: [
       { t: "Dados sintéticos", d: "Gerador determinístico em TypeScript produz os seeds SQL." },
       { t: "PostgreSQL (Supabase)", d: "Schema próprio por domínio, chaves, índices e RLS somente leitura." },
@@ -144,7 +149,7 @@ const pt = {
   demo: {
     back: "Voltar ao portfólio",
     navAria: "Demonstrações",
-    nav: { compras: "Fluxo Compras", faturamento: "Faturamento", juridico: "Legal BI" },
+    nav: { banco: "Banco 360", compras: "Fluxo Compras", faturamento: "Faturamento", juridico: "Legal BI" },
     sourceSupabase: "Dados lidos do banco PostgreSQL (Supabase).",
     sourceLocal: "Banco não configurado: dados gerados localmente pelo mesmo algoritmo dos seeds.",
     sourceLocalLabel: "dados locais",
@@ -407,6 +412,7 @@ export type Dictionary = typeof pt;
 
 const en: Dictionary = {
   sami: samiEn,
+  banco: bancoEn,
   meta: {
     demoSuffix: "demo",
   },
@@ -527,6 +533,9 @@ const en: Dictionary = {
     dataModelText: "Main entities in this demo's database:",
     architecture: "Demo architecture",
     architectureText: "Technical detail for those who want to go further: how data flows through the application.",
+    awsTitle: "AWS equivalence",
+    awsText: "The demo runs at no cost on Supabase and Vercel; the code was written to move to AWS by changing configuration.",
+    awsCols: ["In this demo", "Equivalent AWS service", "Role"],
     architectureSteps: [
       { t: "Synthetic data", d: "A deterministic TypeScript generator produces the SQL seeds." },
       { t: "PostgreSQL (Supabase)", d: "One schema per domain, keys, indexes and read-only RLS." },
@@ -544,7 +553,7 @@ const en: Dictionary = {
   demo: {
     back: "Back to portfolio",
     navAria: "Demos",
-    nav: { compras: "Purchasing Flow", faturamento: "Billing", juridico: "Legal BI" },
+    nav: { banco: "Bank 360", compras: "Purchasing Flow", faturamento: "Billing", juridico: "Legal BI" },
     sourceSupabase: "Data read from the PostgreSQL database (Supabase).",
     sourceLocal: "Database not configured: data generated locally by the same algorithm as the seeds.",
     sourceLocalLabel: "local data",

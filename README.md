@@ -1,9 +1,10 @@
 # Portfólio — Engenharia de Dados, BI e Automação
 
-Portfólio técnico pessoal com **três demonstrações funcionais** de aplicações orientadas a dados:
+Portfólio técnico pessoal com **quatro demonstrações funcionais** de aplicações orientadas a dados:
 
 | Case | Demo | O que mostra |
 |---|---|---|
+| **Banco 360** | `/demo/banco` · `/demo/banco/pipeline` | Lakehouse bancário (PySpark, Airflow, qualidade de dados, LGPD): carteira de crédito, estágios de risco, NPL, transações, macro do BCB e observabilidade do pipeline. Os dados vêm do schema `banco`, alimentado pelo repositório [banco-360-pipeline](https://github.com/devleandroh/banco-360-pipeline) |
 | **Fluxo Compras** | `/demo/compras` | Ciclo Solicitação → Pedido → Nota fiscal, tempos entre etapas, funil, atrasos e detalhe do processo |
 | **Faturamento** | `/demo/faturamento` | Faturamento líquido, ticket médio, devoluções, comparação ano contra ano, rankings |
 | **Legal BI** | `/demo/juridico` | Carteira de processos, risco, valores, tribunais, aging, agenda de prazos e ficha do processo |

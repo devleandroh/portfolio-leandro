@@ -99,7 +99,7 @@ async function main() {
 
   console.log("\nSegurança");
   const rls = await db.query<{ n: number }>(
-    `select count(*)::int as n from pg_tables where schemaname in ('compras','faturamento','legal') and not rowsecurity`,
+    `select count(*)::int as n from pg_tables where schemaname in ('compras','faturamento','legal','banco') and not rowsecurity`,
   );
   check("RLS habilitado em todas as tabelas", rls.rows[0].n === 0);
   await db.exec(`set role anon`);
@@ -112,6 +112,22 @@ async function main() {
     escritaBloqueada = true;
   }
   check("papel anon NÃO consegue escrever", escritaBloqueada);
+  const bancoViews = await db.query<{ n: number }>(`select count(*)::int as n from public.banco_v_carteira_mensal`);
+  check("papel anon lê as views do banco", bancoViews.rows[0].n === 0);
+  let dimBloqueada = false;
+  try {
+    await db.query(`select * from banco.dim_cliente limit 1`);
+  } catch {
+    dimBloqueada = true;
+  }
+  check("papel anon NÃO lê dimensões do banco (dados de cliente)", dimBloqueada);
+  let escritaBanco = false;
+  try {
+    await db.exec(`insert into banco.mart_macro_mensal (ano_mes) values ('2099-01')`);
+  } catch {
+    escritaBanco = true;
+  }
+  check("papel anon NÃO escreve no schema banco", escritaBanco);
   await db.exec(`reset role`);
 
   const mensal = await db.query<{ n: number }>(`select count(*)::int as n from public.faturamento_v_mensal`);
