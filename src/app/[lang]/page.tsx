@@ -1,7 +1,5 @@
-import type { Viewport } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Inter, JetBrains_Mono } from "next/font/google";
 import { BrandFooter, BrandHeader, Highlight, SectionHead } from "@/components/brand/BrandChrome";
 import {
   IconArrow,
@@ -24,12 +22,6 @@ import { contactLinks, getProfile, type ContactLink } from "@/config/profile";
 import { getCases } from "@/content/cases";
 import { hasLocale, localePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
-
-// Fontes da identidade dark, carregadas só na homepage (as demos seguem com IBM Plex).
-const inter = Inter({ variable: "--font-inter", subsets: ["latin"], weight: ["400", "500", "600", "700", "800", "900"] });
-const jetbrains = JetBrains_Mono({ variable: "--font-jetbrains", subsets: ["latin"], weight: ["400", "500"] });
-
-export const viewport: Viewport = { themeColor: "#040A16" };
 
 /** Ícone e cor do tile de cada competência / pill (azul = estrutura, verde = sinal). */
 const SKILL_ICONS = [
@@ -58,7 +50,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
   const others = contatos.filter((c) => c !== primary);
 
   return (
-    <div className={`brand-page ${inter.variable} ${jetbrains.variable}`}>
+    <div className="brand-page">
       <Reveal />
       <BrandHeader lang={lang} />
       <main className="flex-1">

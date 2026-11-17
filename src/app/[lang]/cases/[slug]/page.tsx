@@ -26,7 +26,7 @@ export default async function CasePage({ params }: PageProps<"/[lang]/cases/[slu
   const t = getDictionary(lang).casePage;
 
   return (
-    <>
+    <div className="brand-chrome flex flex-1 flex-col">
       <SiteHeader lang={lang} />
       <main className="flex-1">
         <section className="blueprint border-b border-line">
@@ -40,7 +40,7 @@ export default async function CasePage({ params }: PageProps<"/[lang]/cases/[slu
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
                 href={localePath(lang, c.demoHref)}
-                className="inline-flex items-center gap-2 rounded-md bg-ink px-5 py-2.5 text-sm font-medium text-surface transition-colors hover:bg-accent-strong"
+                className="inline-flex items-center gap-2 rounded-md btn-grad px-5 py-2.5 text-sm"
               >
                 {t.openDemo} <ArrowUpRight className="h-4 w-4" />
               </Link>
@@ -149,7 +149,7 @@ export default async function CasePage({ params }: PageProps<"/[lang]/cases/[slu
         </section>
       </main>
       <SiteFooter lang={lang} />
-    </>
+    </div>
   );
 }
 

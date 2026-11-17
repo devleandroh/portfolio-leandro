@@ -30,7 +30,7 @@ export function DemoHeader({
       </div>
       {warning && (
         <p className="mt-3 flex items-center gap-2 rounded-md border border-warning/50 bg-warning/10 px-3 py-2 text-xs">
-          <AlertTriangle className="h-4 w-4 text-[#7a5200]" /> {translateValue(lang, warning)}
+          <AlertTriangle className="h-4 w-4 text-warning" /> {translateValue(lang, warning)}
         </p>
       )}
     </div>

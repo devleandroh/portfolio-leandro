@@ -1,21 +1,23 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
-import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import { getProfile } from "@/config/profile";
 import { hasLocale, htmlLang, locales, ogLocale } from "@/i18n/config";
 import "../globals.css";
 
-const plexSans = IBM_Plex_Sans({
-  variable: "--font-plex-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
-const plexMono = IBM_Plex_Mono({
-  variable: "--font-plex-mono",
+const jetbrains = JetBrains_Mono({
+  variable: "--font-jetbrains",
   subsets: ["latin"],
   weight: ["400", "500"],
 });
+
+export const viewport: Viewport = { themeColor: "#040A16" };
 
 // Em produção na Vercel, cai para o domínio do projeto se NEXT_PUBLIC_SITE_URL não estiver definida,
 // para que a imagem Open Graph nunca aponte para localhost.
@@ -55,7 +57,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
   const { lang } = await params;
   if (!hasLocale(lang)) notFound();
   return (
-    <html lang={htmlLang[lang]} className={`${plexSans.variable} ${plexMono.variable} h-full`}>
+    <html lang={htmlLang[lang]} className={`${inter.variable} ${jetbrains.variable} h-full`}>
       <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );

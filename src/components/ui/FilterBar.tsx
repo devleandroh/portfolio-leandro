@@ -124,7 +124,7 @@ export function FilterBar({
       )}
 
       <div className="flex items-center gap-2">
-        <button type="submit" className="h-8 rounded-md bg-ink px-3 text-xs font-medium text-surface hover:bg-accent-strong">
+        <button type="submit" className="h-8 rounded-md btn-grad px-3 text-xs">
           {labels.apply}
         </button>
         {hasFilters && (

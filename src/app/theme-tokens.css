@@ -55,8 +55,8 @@
   --r-sm: 10px;  --r-md: 14px;  --r-lg: 20px;  --r-xl: 28px;
 
   /* ---------- tipografia ---------- */
-  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font: var(--font-inter), 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: var(--font-jetbrains), 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 }
 
 /* =========================================================================

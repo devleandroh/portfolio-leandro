@@ -180,7 +180,7 @@ export function SamiChat({ lang }: { lang: Locale }) {
             <button
               type="submit"
               disabled={busy || input.trim().length < 2}
-              className="inline-flex items-center gap-1.5 rounded-md bg-ink px-4 py-2 text-sm font-medium text-surface transition-colors hover:bg-accent-strong disabled:opacity-40"
+              className="inline-flex items-center gap-1.5 rounded-md btn-grad px-4 py-2 text-sm disabled:opacity-40"
             >
               {t.send} <ArrowUp className="h-4 w-4" />
             </button>

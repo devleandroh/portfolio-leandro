@@ -18,9 +18,9 @@ export interface Series {
 }
 
 const COLORS = {
-  grid: "#e1e0d9",
-  axis: "#c3c2b7",
-  tick: "#898781",
+  grid: "#1a3150",
+  axis: "#2c4c75",
+  tick: "#a3b8d6",
 };
 
 const fullFormat = (f: ValueFormat, lang: Locale) => {
@@ -112,7 +112,7 @@ export function TrendChart({
               strokeWidth={2}
               strokeDasharray={s.dashed ? "5 4" : undefined}
               dot={false}
-              activeDot={{ r: 4, stroke: "#fcfcfb", strokeWidth: 2 }}
+              activeDot={{ r: 4, stroke: "#0a1730", strokeWidth: 2 }}
               isAnimationActive={false}
             />
           ))}
@@ -146,7 +146,7 @@ export function ColumnChart({
           <CartesianGrid vertical={false} stroke={COLORS.grid} />
           <XAxis dataKey={xKey} tickLine={false} axisLine={{ stroke: COLORS.axis }} tick={{ fill: COLORS.tick, fontSize: 11 }} minTickGap={8} />
           <YAxis tickLine={false} axisLine={false} tick={{ fill: COLORS.tick, fontSize: 11 }} tickFormatter={tickFormat(format, lang)} width={48} allowDecimals={false} />
-          <Tooltip content={(p) => <ChartTooltip {...(p as TooltipContentProps<number, string>)} format={format} lang={lang} />} cursor={{ fill: "rgb(11 11 11 / 0.04)" }} />
+          <Tooltip content={(p) => <ChartTooltip {...(p as TooltipContentProps<number, string>)} format={format} lang={lang} />} cursor={{ fill: "rgb(138 212 255 / 0.06)" }} />
           {series.map((s) => (
             <Bar key={s.key} dataKey={s.key} name={s.name} fill={s.color} radius={[4, 4, 0, 0]} maxBarSize={24} isAnimationActive={false} />
           ))}

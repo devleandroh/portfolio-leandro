@@ -32,7 +32,7 @@ export function SamiArchitecture({ lang }: { lang: Locale }) {
       <ol className="mt-5 space-y-3">
         {t.layers.map((layer, i) => (
           <li key={layer.name} className="grid gap-2 md:grid-cols-[150px_1fr] md:items-stretch">
-            <p className="font-mono text-[11px] text-accent-soft/70 md:pt-3">
+            <p className="font-mono text-[11px] text-brand-300/80 md:pt-3">
               {String(i + 1).padStart(2, "0")} · {layer.name}
             </p>
             <div className={`grid gap-2 ${layer.nodes.length > 1 ? "sm:grid-cols-2" : ""} ${layer.nodes.length > 2 ? "lg:grid-cols-3" : ""}`}>
@@ -72,7 +72,7 @@ function FlowList({ title, items, tone }: { title: string; items: string[]; tone
       <ol className="mt-3 space-y-2">
         {items.map((it, i) => (
           <li key={it} className="flex gap-3 text-sm text-white/75">
-            <span className="font-mono text-[11px] text-accent-soft/60">{i + 1}</span>
+            <span className="font-mono text-[11px] text-brand-300/70">{i + 1}</span>
             <span>{it}</span>
           </li>
         ))}

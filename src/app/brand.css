@@ -50,13 +50,13 @@ body:has(.brand-page) {
 }
 
 /* foco visível — o tema escuro não pode esconder o foco */
-.brand-page :focus-visible {
+:is(.brand-page, .brand-chrome) :focus-visible {
   outline: 2px solid var(--blue-400);
   outline-offset: 3px;
   border-radius: 6px;
 }
 
-.brand-page .wrap {
+:is(.brand-page, .brand-chrome) .wrap {
   width: min(1180px, calc(100% - 32px));
   margin-inline: auto;
 }
@@ -103,7 +103,7 @@ body:has(.brand-page) {
 }
 
 /* ---------- botões ---------- */
-.brand-page .btn {
+:is(.brand-page, .brand-chrome) .btn {
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -118,31 +118,31 @@ body:has(.brand-page) {
     border-color 0.25s ease,
     background-color 0.25s ease;
 }
-.brand-page .btn svg {
+:is(.brand-page, .brand-chrome) .btn svg {
   width: 18px;
   height: 18px;
   flex: none;
 }
-.brand-page .btn-primary {
+:is(.brand-page, .brand-chrome) .btn-primary {
   background: var(--grad-brand);
   color: #03121f;
   font-weight: 700;
   box-shadow: var(--glow-blue);
 }
-.brand-page .btn-primary:hover {
+:is(.brand-page, .brand-chrome) .btn-primary:hover {
   filter: brightness(1.08);
   transform: translateY(-2px);
 }
-.brand-page .btn-ghost {
+:is(.brand-page, .brand-chrome) .btn-ghost {
   border-color: var(--line-2);
   color: var(--text);
   background: rgba(10, 27, 51, 0.5);
 }
-.brand-page .btn-ghost:hover {
+:is(.brand-page, .brand-chrome) .btn-ghost:hover {
   border-color: var(--blue-400);
   background: rgba(30, 155, 255, 0.12);
 }
-.brand-page .btn-sm {
+:is(.brand-page, .brand-chrome) .btn-sm {
   padding: 11px 20px;
   font-size: 14px;
 }
@@ -186,7 +186,7 @@ body:has(.brand-page) {
 }
 
 /* ---------- NAV ---------- */
-.brand-page .nav {
+:is(.brand-page, .brand-chrome) .nav {
   position: sticky;
   top: 0;
   z-index: 50;
@@ -194,20 +194,20 @@ body:has(.brand-page) {
   background: rgba(4, 10, 22, 0.72);
   border-bottom: 1px solid var(--line);
 }
-.brand-page .nav-in {
+:is(.brand-page, .brand-chrome) .nav-in {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   height: 70px;
 }
-.brand-page .brand {
+:is(.brand-page, .brand-chrome) .brand {
   display: flex;
   align-items: center;
   gap: 12px;
   min-width: 0;
 }
-.brand-page .logo {
+:is(.brand-page, .brand-chrome) .logo {
   width: 38px;
   height: 38px;
   border-radius: 11px;
@@ -220,32 +220,32 @@ body:has(.brand-page) {
   background: var(--grad-brand);
   box-shadow: var(--glow-blue);
 }
-.brand-page .brand b {
+:is(.brand-page, .brand-chrome) .brand b {
   font-size: 15.5px;
   font-weight: 700;
   letter-spacing: -0.01em;
   white-space: nowrap;
 }
-.brand-page .brand .tagline {
+:is(.brand-page, .brand-chrome) .brand .tagline {
   font-family: var(--mono);
   font-size: 13px;
   color: var(--muted);
   white-space: nowrap;
 }
-.brand-page .menu {
+:is(.brand-page, .brand-chrome) .menu {
   display: flex;
   align-items: center;
   gap: 26px;
 }
-.brand-page .menu > a:not(.btn) {
+:is(.brand-page, .brand-chrome) .menu > a:not(.btn) {
   font-size: 14.5px;
   color: var(--text-2);
   transition: color 0.2s;
 }
-.brand-page .menu > a:not(.btn):hover {
+:is(.brand-page, .brand-chrome) .menu > a:not(.btn):hover {
   color: var(--blue-300);
 }
-.brand-page .menu .btn {
+:is(.brand-page, .brand-chrome) .menu .btn {
   padding: 10px 20px;
   font-size: 14px;
 }
@@ -812,34 +812,34 @@ body:has(.brand-page) {
 }
 
 /* ---------- RODAPÉ ---------- */
-.brand-page .site-foot {
+:is(.brand-page, .brand-chrome) .site-foot {
   position: relative;
   margin-top: clamp(60px, 8vw, 100px);
 }
-.brand-page .waves {
+:is(.brand-page, .brand-chrome) .waves {
   display: block;
   width: 100%;
   height: clamp(70px, 12vw, 170px);
   margin-bottom: -1px;
 }
-.brand-page .foot-in {
+:is(.brand-page, .brand-chrome) .foot-in {
   border-top: 1px solid var(--line);
   padding: 28px 0;
   font-size: 14px;
   color: var(--muted);
   background: var(--bg-900);
 }
-.brand-page .foot-in .wrap {
+:is(.brand-page, .brand-chrome) .foot-in .wrap {
   display: flex;
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
 }
-.brand-page .foot-in a {
+:is(.brand-page, .brand-chrome) .foot-in a {
   color: var(--text-2);
   transition: color 0.2s;
 }
-.brand-page .foot-in a:hover {
+:is(.brand-page, .brand-chrome) .foot-in a:hover {
   color: var(--blue-300);
 }
 
@@ -864,13 +864,13 @@ body:has(.brand-page) {
   .brand-page .card,
   .brand-page .pill,
   .brand-page .s4,
-  .brand-page .btn {
+  :is(.brand-page, .brand-chrome) .btn {
     transition: none;
   }
   .brand-page .card:hover,
   .brand-page .pill:hover,
   .brand-page .s4:hover,
-  .brand-page .btn:hover {
+  :is(.brand-page, .brand-chrome) .btn:hover {
     transform: none;
   }
   .brand-page .live i {
@@ -899,7 +899,7 @@ body:has(.brand-page) {
   .brand-page .ba-arrow {
     transform: rotate(90deg);
   }
-  .brand-page .menu > a:not(.btn) {
+  :is(.brand-page, .brand-chrome) .menu > a:not(.btn) {
     display: none;
   }
 }
@@ -918,13 +918,13 @@ body:has(.brand-page) {
   .brand-page .who {
     flex-wrap: wrap;
   }
-  .brand-page .brand .tagline {
+  :is(.brand-page, .brand-chrome) .brand .tagline {
     display: none;
   }
-  .brand-page .menu {
+  :is(.brand-page, .brand-chrome) .menu {
     gap: 10px;
   }
-  .brand-page .menu .btn {
+  :is(.brand-page, .brand-chrome) .menu .btn {
     padding: 9px 14px;
   }
 }

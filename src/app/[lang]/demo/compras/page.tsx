@@ -101,7 +101,7 @@ export default async function ComprasPage({ params: route, searchParams }: PageP
                   <li key={f.etapa} className="grid grid-cols-[120px_1fr] items-center gap-3 text-xs sm:grid-cols-[140px_1fr]">
                     <span className="text-ink-2">{tv(f.etapa)}</span>
                     <div className="flex items-center gap-2">
-                      <div className="h-6 rounded-r-[4px]" style={{ width: `${(f.valor / maxFunil) * 85}%`, background: ["#1c5cab", "#256abf", "#2a78d6", "#5598e7", "#86b6ef"][i] }} />
+                      <div className="h-6 rounded-r-[4px]" style={{ width: `${(f.valor / maxFunil) * 85}%`, background: ["#0b74e5", "#1e9bff", "#38bdf8", "#5fd0d0", "#22e27a"][i] }} />
                       <span className="font-medium tabular whitespace-nowrap">
                         {fmtInt(f.valor)}
                         {i > 0 && <span className="ml-1 font-normal text-muted">{fmtPct(f.valor / maxFunil)}</span>}

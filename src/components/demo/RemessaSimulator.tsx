@@ -271,7 +271,7 @@ export function RemessaSimulator({ lang }: { lang: Locale }) {
             onClick={() => executar()}
             disabled={rodando}
             className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors disabled:opacity-60 ${
-              passo === 0 ? "bg-ink text-surface hover:bg-accent-strong" : "border border-axis bg-surface hover:border-ink"
+              passo === 0 ? "btn-grad" : "border border-axis bg-surface hover:border-ink"
             }`}
           >
             <Play className="h-4 w-4" /> {rodando ? t.rodando : t.rodar}
@@ -514,7 +514,7 @@ function Previa({
 
   const pdf = arquivo.formato === "PDF";
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/50 p-3 sm:p-6" onClick={onFechar} role="presentation">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-night/75 p-3 sm:p-6" onClick={onFechar} role="presentation">
       <div
         role="dialog"
         aria-modal="true"
@@ -690,7 +690,7 @@ function PainelFalhas({
           onClick={onReenviar}
           disabled={!pronto || rodando}
           className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition-colors ${
-            pronto ? "bg-ink text-surface hover:bg-accent-strong" : "cursor-not-allowed border border-line bg-page text-muted"
+            pronto ? "btn-grad" : "cursor-not-allowed border border-line bg-page text-muted"
           } ${pronto && !rodando ? "ring-4 ring-accent/30" : ""}`}
         >
           <RotateCcw className="h-4 w-4" /> {rodando ? t.rodando : t.reenviar(falhas.length)}

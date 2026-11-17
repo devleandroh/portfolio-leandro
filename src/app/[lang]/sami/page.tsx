@@ -25,7 +25,7 @@ export default async function SamiPage({ params }: PageProps<"/[lang]/sami">) {
   const STATE_BY_MODE = ["live", "partial", "documented"] as const;
 
   return (
-    <>
+    <div className="brand-chrome flex flex-1 flex-col">
       <SiteHeader lang={lang} />
       <main className="flex-1">
         {/* APRESENTAÇÃO */}
@@ -52,7 +52,7 @@ export default async function SamiPage({ params }: PageProps<"/[lang]/sami">) {
               </ul>
             </div>
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <a href="#demo" className="inline-flex items-center gap-2 rounded-md bg-ink px-5 py-2.5 text-sm font-medium text-surface transition-colors hover:bg-accent-strong">
+              <a href="#demo" className="inline-flex items-center gap-2 rounded-md btn-grad px-5 py-2.5 text-sm">
                 {d.hero.ctaDemo} <ArrowDown className="h-4 w-4" />
               </a>
               <a href="#arquitetura" className="inline-flex items-center gap-2 rounded-md border border-axis bg-surface px-5 py-2.5 text-sm font-medium transition-colors hover:border-ink">
@@ -140,7 +140,7 @@ export default async function SamiPage({ params }: PageProps<"/[lang]/sami">) {
         </section>
       </main>
       <SiteFooter lang={lang} />
-    </>
+    </div>
   );
 }
 
@@ -156,7 +156,7 @@ function SectionTitle({ eyebrow, title, text }: { eyebrow: string; title: string
 
 const BADGE: Record<"live" | "partial" | "documented", string> = {
   live: "border-good/40 bg-good/10 text-good-text",
-  partial: "border-warning/60 bg-warning/15 text-[#7a5200]",
+  partial: "border-warning/60 bg-warning/15 text-warning",
   documented: "border-axis bg-wash text-ink-2",
 };
 

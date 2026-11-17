@@ -20,7 +20,7 @@ export default async function DemoLayout({ children, params }: LayoutProps<"/[la
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 pt-2 sm:px-6">
           <Link href={localePath(lang, "/#cases")} className="flex items-center gap-2 py-1 text-sm text-ink-2 hover:text-ink">
             <ArrowLeft className="h-4 w-4" />
-            <Monogram className="h-6 w-6 text-ink" />
+            <Monogram className="h-6 w-6" />
             <span className="hidden sm:inline">{t.demo.back}</span>
           </Link>
           <div className="flex items-center gap-2">

@@ -32,7 +32,7 @@ export default async function SamiDocumentPage({ params }: PageProps<"/[lang]/sa
   const { fmtDate } = formatters(lang);
 
   return (
-    <>
+    <div className="brand-chrome flex flex-1 flex-col">
       <SiteHeader lang={lang} />
       <main className="flex-1">
         <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
@@ -77,6 +77,6 @@ export default async function SamiDocumentPage({ params }: PageProps<"/[lang]/sa
         </article>
       </main>
       <SiteFooter lang={lang} />
-    </>
+    </div>
   );
 }

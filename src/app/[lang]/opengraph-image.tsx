@@ -27,14 +27,14 @@ export default async function OpengraphImage({ params }: { params: Promise<{ lan
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 72,
-          background: "#111110",
-          color: "#ffffff",
+          background: "linear-gradient(160deg, #0E2A4E 0%, #040A16 60%)",
+          color: "#EAF2FF",
           fontFamily: "sans-serif",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <div style={{ width: 20, height: 20, background: "#2a78d6" }} />
-          <div style={{ fontSize: 28, color: "#cde2fb", letterSpacing: 2, textTransform: "uppercase" }}>
+          <div style={{ width: 20, height: 20, borderRadius: 6, background: "linear-gradient(90deg, #1E9BFF, #00C85A)" }} />
+          <div style={{ fontSize: 28, color: "#8AD4FF", letterSpacing: 2, textTransform: "uppercase" }}>
             {profile.role}
           </div>
         </div>
@@ -47,9 +47,9 @@ export default async function OpengraphImage({ params }: { params: Promise<{ lan
                 style={{
                   fontSize: 24,
                   padding: "8px 16px",
-                  border: "1px solid rgba(255,255,255,0.25)",
+                  border: "1px solid rgba(94,169,255,0.34)",
                   borderRadius: 6,
-                  color: "rgba(255,255,255,0.8)",
+                  color: "#B9CCE8",
                 }}
               >
                 {p}
@@ -57,7 +57,7 @@ export default async function OpengraphImage({ params }: { params: Promise<{ lan
             ))}
           </div>
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 26, color: "rgba(255,255,255,0.6)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 26, color: "#A3B8D6" }}>
           <div>{profile.name}</div>
           <div>{t.footer}</div>
         </div>
