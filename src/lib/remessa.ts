@@ -103,3 +103,42 @@ export function resumir(itens: { motivo: Motivo | null }[]): { enviados: number;
   const erros = itens.filter((i) => i.motivo !== null).length;
   return { enviados: itens.length - erros, erros };
 }
+
+/** Amostra da aba ORIGEM (preços da semana), com os mesmos produtos da planilha demo do projeto. */
+export const PRODUTOS_DEMO = [
+  { codigo: "P001", produto: "Arroz tipo 1 5 kg", unidade: "pct", preco: 27.75 },
+  { codigo: "P002", produto: "Feijão carioca 1 kg", unidade: "pct", preco: 8.49 },
+  { codigo: "P004", produto: "Café torrado 500 g", unidade: "pct", preco: 18.79 },
+  { codigo: "P009", produto: "Leite integral 1 L", unidade: "cx", preco: 5.04 },
+  { codigo: "P010", produto: "Queijo muçarela kg", unidade: "kg", preco: 38.99 },
+  { codigo: "P017", produto: "Tomate kg", unidade: "kg", preco: 7.06 },
+  { codigo: "P024", produto: "Sabão em pó 1,6 kg", unidade: "cx", preco: 20.26 },
+  { codigo: "P027", produto: "Refrigerante 2 L", unidade: "un", preco: 9.2 },
+] as const;
+
+/** Desconto de cada cliente (célula B3 da aba do cliente), igual a src/remessa/demo.py. */
+export const DESCONTO_POR_ABA: Record<string, number> = {
+  BOMPRECO: 0.05, PADARIA: 0.03, EMPORIO: 0.04, HORIZONTE: 0.08, HORTIFRUTI: 0.06,
+};
+
+export interface LinhaTabela {
+  codigo: string;
+  produto: string;
+  unidade: string;
+  preco: number;
+  precoCliente: number;
+}
+
+/** O conteúdo do arquivo gerado: a aba do cliente, já calculada (preço base × (1 − desconto)). */
+export function tabelaCliente(aba: string): { desconto: number; linhas: LinhaTabela[] } {
+  const desconto = DESCONTO_POR_ABA[aba] ?? 0;
+  return {
+    desconto,
+    linhas: PRODUTOS_DEMO.map((p) => ({ ...p, precoCliente: Math.round(p.preco * (1 - desconto) * 100) / 100 })),
+  };
+}
+
+/** Pasta onde o arquivo é salvo, igual ao projeto: Envios/<semana>/ e, no modo de teste, Envios/<semana>/teste/. */
+export function pastaEnvio(teste: boolean, semana = SEMANA): string {
+  return `Envios/${semana}/${teste ? "teste/" : ""}`;
+}

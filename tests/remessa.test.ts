@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  CONTROLE_INICIAL, DATA_OPTIN_DEMO, DESTINO_TESTE, EMAIL_CORRIGIDO, mascarar, nomeArquivo, nomeArquivoSeguro, planejarLote, resumir, validar,
+  CONTROLE_INICIAL, DATA_OPTIN_DEMO, DESTINO_TESTE, EMAIL_CORRIGIDO, mascarar, nomeArquivo, nomeArquivoSeguro, pastaEnvio, planejarLote, resumir, tabelaCliente, validar,
 } from "@/lib/remessa";
 
 describe("Remessa: envio de planilhas", () => {
@@ -47,5 +47,18 @@ describe("Remessa: envio de planilhas", () => {
   it("mascara destinatários", () => {
     expect(mascarar("compras@bompreco.exemplo.com", "email")).toBe("co***@bompreco.exemplo.com");
     expect(mascarar("5531900000001", "whatsapp")).toBe("+55 31 9****-0001");
+  });
+});
+
+describe("arquivos gerados", () => {
+  it("calcula a tabela do cliente com o desconto da aba", () => {
+    const { desconto, linhas } = tabelaCliente("PADARIA");
+    expect(desconto).toBe(0.03);
+    expect(linhas[0]).toMatchObject({ codigo: "P001", preco: 27.75, precoCliente: 26.92 });
+  });
+
+  it("separa a pasta do modo de teste", () => {
+    expect(pastaEnvio(false)).toBe("Envios/2026-S47/");
+    expect(pastaEnvio(true)).toBe("Envios/2026-S47/teste/");
   });
 });

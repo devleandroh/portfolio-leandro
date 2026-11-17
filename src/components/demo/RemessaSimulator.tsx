@@ -1,15 +1,27 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  ArrowRight, Check, CheckCircle2, FileSpreadsheet, FileText, Mail, MessageCircle, Play, RotateCcw, ShieldCheck, Trash2, Wrench, XCircle,
+  ArrowRight, Check, CheckCircle2, ChevronDown, FileSpreadsheet, FileText, FolderOpen, HelpCircle, Mail, MessageCircle, MousePointerClick,
+  Play, RotateCcw, Send, ShieldCheck, Table2, Trash2, Wrench, X, XCircle,
 } from "lucide-react";
 import { remessaTexts, type RemessaTexts } from "@/i18n/remessa";
 import type { Locale } from "@/i18n/config";
 import {
-  CONTROLE_INICIAL, DATA_OPTIN_DEMO, EMAIL_CORRIGIDO, SEMANA, mascarar, planejarLote, resumir, validar, type Canal, type ItemLote,
-  type LinhaControle, type Motivo,
+  CONTROLE_INICIAL, DATA_OPTIN_DEMO, EMAIL_CORRIGIDO, mascarar, pastaEnvio, planejarLote, resumir, tabelaCliente, validar, type Canal,
+  type Formato, type ItemLote, type LinhaControle, type Motivo,
 } from "@/lib/remessa";
+
+interface Arquivo {
+  nome: string;
+  pasta: string;
+  formato: Formato;
+  aba: string;
+  cliente: string;
+  canal: Canal;
+  enviado: boolean;
+  novo: boolean;
+}
 
 type Etapa = "gerando" | "enviando" | "enviado" | "erro";
 
@@ -41,7 +53,10 @@ export function RemessaSimulator({ lang }: { lang: Locale }) {
   const [teste, setTeste] = useState(true);
   const [log, setLog] = useState<LinhaLog[]>([]);
   const [rodando, setRodando] = useState(false);
-  const [resumo, setResumo] = useState<{ enviados: number; erros: number } | null>(null);
+  const [resumo, setResumo] = useState<{ enviados: number; erros: number; pasta: string } | null>(null);
+  const [arquivos, setArquivos] = useState<Arquivo[]>([]);
+  const [previa, setPrevia] = useState<Arquivo | null>(null);
+  const fecharPrevia = useCallback(() => setPrevia(null), []);
   const [falhas, setFalhas] = useState<Falha[]>([]);
   const [destaque, setDestaque] = useState<number | null>(null);
   const execRef = useRef(0);
@@ -64,6 +79,9 @@ export function RemessaSimulator({ lang }: { lang: Locale }) {
   const idsComErro = new Set(pendentes.map((f) => f.id));
   // Passo atual do guia: 0 = rodar, 1 = corrigir, 2 = reenviar, 3 = concluído
   const passo = rodando ? (falhas.length ? 2 : 0) : !resumo ? 0 : falhas.length === 0 ? 3 : pendentes.length ? 1 : 2;
+  // Etapas do diagrama "Como funciona" em destaque durante o lote: gerando → gera + salva; enviando → envia.
+  const etapaAtual = rodando ? log[0]?.etapa : undefined;
+  const fases = etapaAtual === "gerando" ? [2, 3] : etapaAtual === "enviando" ? [4] : [];
 
   async function executar(apenas?: ReadonlySet<number>) {
     const lote = planejarLote(controle, { teste, apenas });
@@ -72,23 +90,35 @@ export function RemessaSimulator({ lang }: { lang: Locale }) {
     execRef.current += 1;
     const execucao = `exec-${String(execRef.current).padStart(4, "0")}`;
     const atualizar = (key: string, etapa: Etapa) => setLog((l) => l.map((r) => (r.key === key ? { ...r, etapa } : r)));
+    const pasta = pastaEnvio(teste);
+    const gravarArquivo = (item: ItemLote, enviado: boolean) =>
+      setArquivos((lista) => {
+        const arq: Arquivo = {
+          nome: item.arquivo, pasta, formato: item.linha.formato, aba: item.linha.aba, cliente: item.linha.cliente, canal: item.linha.canal,
+          enviado, novo: !enviado,
+        };
+        const resto = lista.filter((a) => !(a.nome === arq.nome && a.pasta === arq.pasta)).map((a) => ({ ...a, novo: false }));
+        return [arq, ...resto];
+      });
 
     for (const item of lote) {
       if (!vivo.current) return;
       const key = `${execucao}-${item.linha.id}`;
       setLog((l) => [novaLinha(key, execucao, item, teste), ...l]);
-      await espera(PASSO_MS);
+      await espera(PASSO_MS * 1.4);
       if (item.motivo) {
-        atualizar(key, "erro");
+        atualizar(key, "erro"); // validação falhou: nenhum arquivo é gerado
         continue;
       }
+      gravarArquivo(item, false);
       atualizar(key, "enviando");
-      await espera(PASSO_MS);
+      await espera(PASSO_MS * 1.4);
+      gravarArquivo(item, true);
       atualizar(key, "enviado");
     }
     if (!vivo.current) return;
     const novasFalhas = lote.filter((i) => i.motivo).map((i) => ({ id: i.linha.id, cliente: i.linha.cliente, motivo: i.motivo as Motivo }));
-    setResumo(resumir(lote));
+    setResumo({ ...resumir(lote), pasta });
     setFalhas(novasFalhas);
     setRodando(false);
     if (novasFalhas.length) {
@@ -114,10 +144,13 @@ export function RemessaSimulator({ lang }: { lang: Locale }) {
     setLog([]);
     setResumo(null);
     setFalhas([]);
+    setArquivos([]);
     execRef.current = 0;
   }
 
   return (
+    <div className="space-y-4">
+    <ComoFunciona t={t} fases={fases} />
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_300px]">
       <div className="min-w-0 space-y-4">
         <Guia passos={t.passos} atual={passo} rotuloAtual={t.passoAtual} />
@@ -213,7 +246,7 @@ export function RemessaSimulator({ lang }: { lang: Locale }) {
               {resumo.erros ? <XCircle className="h-4 w-4 shrink-0 text-critical" /> : <CheckCircle2 className="h-4 w-4 shrink-0 text-good" />}
               <span>
                 <strong className="font-semibold">{t.resumo(resumo.enviados, resumo.erros)}</strong>
-                <span className="text-ink-2"> · {t.pasta(SEMANA)}</span>
+                <span className="text-ink-2"> · {t.salvoEm(resumo.pasta)}</span>
               </span>
             </p>
 
@@ -235,6 +268,8 @@ export function RemessaSimulator({ lang }: { lang: Locale }) {
             )}
           </div>
         )}
+
+        <PastaEnvios t={t} arquivos={arquivos} teveErro={log.some((r) => r.etapa === "erro")} onAbrir={setPrevia} />
 
         {/* LOG */}
         <section className="rounded-lg border border-line bg-surface">
@@ -304,6 +339,246 @@ export function RemessaSimulator({ lang }: { lang: Locale }) {
         </section>
       </aside>
     </div>
+    <Faq t={t} />
+    {previa && <Previa t={t} lang={lang} arquivo={previa} onFechar={fecharPrevia} />}
+    </div>
+  );
+}
+
+const ICONES_ETAPA = [Table2, MousePointerClick, FileText, FolderOpen, Send];
+
+function ComoFunciona({ t, fases }: { t: RemessaTexts; fases: number[] }) {
+  return (
+    <section className="rounded-lg border border-line bg-surface p-4">
+      <h2 className="text-sm font-semibold">{t.comoFunciona.title}</h2>
+      <p className="mt-1 max-w-3xl text-sm text-ink-2">{t.comoFunciona.lead}</p>
+      <ol className="mt-4 grid gap-2 md:grid-cols-5 md:gap-0">
+        {t.comoFunciona.etapas.map((e, i) => {
+          const Icon = ICONES_ETAPA[i];
+          const ativa = fases.includes(i);
+          return (
+            <li key={e.t} className="flex items-stretch md:flex-col">
+              <div className="flex flex-1 items-stretch">
+                <div
+                  className={`flex-1 rounded-md border p-3 transition-colors duration-300 ${
+                    ativa ? "border-accent bg-accent-soft/50" : "border-line bg-page"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full ${ativa ? "bg-accent-strong text-surface" : "bg-surface text-ink-2"}`}>
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <p className="text-sm font-semibold leading-tight">
+                      <span className="font-mono text-[11px] text-muted">{i + 1}.</span> {e.t}
+                    </p>
+                    {ativa && <span className="ml-auto animate-pulse text-[11px] font-medium text-accent-strong">{t.comoFunciona.agora}</span>}
+                  </div>
+                  <p className="mt-1.5 text-xs leading-relaxed text-ink-2">{e.d}</p>
+                </div>
+                {i < 4 && (
+                  <ArrowRight aria-hidden className="mx-1 hidden h-4 w-4 shrink-0 self-center text-muted md:block" />
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    </section>
+  );
+}
+
+function PastaEnvios({
+  t, arquivos, teveErro, onAbrir,
+}: {
+  t: RemessaTexts;
+  arquivos: Arquivo[];
+  teveErro: boolean;
+  onAbrir: (a: Arquivo) => void;
+}) {
+  const pastas = [...new Set(arquivos.map((a) => a.pasta))].sort();
+  return (
+    <section className="rounded-lg border border-line bg-surface">
+      <div className="border-b border-line px-4 py-3">
+        <h2 className="flex items-center gap-2 text-sm font-semibold">
+          <FolderOpen className="h-4 w-4 text-warning" /> {t.pasta.title}
+        </h2>
+        <p className="mt-1 text-xs text-muted">{t.pasta.hint}</p>
+      </div>
+      {arquivos.length === 0 ? (
+        <p className="px-4 py-6 text-center text-sm text-muted">{t.pasta.vazia}</p>
+      ) : (
+        <div className="space-y-3 px-4 py-3">
+          {pastas.map((pasta) => (
+            <div key={pasta}>
+              <p className="flex items-center gap-1.5 font-mono text-xs text-ink-2">
+                <FolderOpen className="h-3.5 w-3.5 text-warning" /> {pasta}
+              </p>
+              <ul className="mt-1.5 space-y-1 border-l border-line pl-3">
+                {arquivos
+                  .filter((a) => a.pasta === pasta)
+                  .map((a) => {
+                    const Icon = a.formato === "PDF" ? FileText : FileSpreadsheet;
+                    return (
+                      <li key={a.nome}>
+                        <button
+                          type="button"
+                          onClick={() => onAbrir(a)}
+                          className={`group flex w-full flex-wrap items-center gap-x-2 gap-y-0.5 rounded-md px-2 py-1.5 text-left text-xs transition-colors hover:bg-page ${
+                            a.novo ? "bg-accent-soft/40" : ""
+                          }`}
+                        >
+                          <Icon className={`h-4 w-4 shrink-0 ${a.formato === "PDF" ? "text-critical" : "text-good"}`} />
+                          <span className="min-w-0 break-all font-mono">{a.nome}</span>
+                          <span className={`text-[11px] ${a.enviado ? "text-good-text" : "text-accent-strong"}`}>
+                            {a.enviado ? `✔ ${t.pasta.enviadoPor(t.canalNome[a.canal])}` : `● ${t.pasta.gerado}`}
+                          </span>
+                          <span className="ml-auto text-[11px] text-accent-strong underline-offset-2 group-hover:underline">{t.pasta.ver}</span>
+                        </button>
+                      </li>
+                    );
+                  })}
+              </ul>
+            </div>
+          ))}
+          {teveErro && <p className="text-xs text-muted">{t.pasta.semArquivo}</p>}
+        </div>
+      )}
+    </section>
+  );
+}
+
+const brl = (v: number, lang: string) => v.toLocaleString(lang === "en" ? "en-US" : "pt-BR", { style: "currency", currency: "BRL" });
+
+function Previa({ t, lang, arquivo, onFechar }: { t: RemessaTexts; lang: Locale; arquivo: Arquivo; onFechar: () => void }) {
+  const { desconto, linhas } = tabelaCliente(arquivo.aba);
+  const pct = `${(desconto * 100).toLocaleString(lang === "en" ? "en-US" : "pt-BR")}%`;
+  const fecharRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    fecharRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onFechar();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onFechar]);
+
+  const pdf = arquivo.formato === "PDF";
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-ink/50 p-4" onClick={onFechar} role="presentation">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={arquivo.nome}
+        onClick={(e) => e.stopPropagation()}
+        className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg border border-line bg-surface shadow-xl"
+      >
+        <div className="flex items-start gap-3 border-b border-line px-4 py-3">
+          {pdf ? <FileText className="mt-0.5 h-5 w-5 shrink-0 text-critical" /> : <FileSpreadsheet className="mt-0.5 h-5 w-5 shrink-0 text-good" />}
+          <div className="min-w-0 flex-1">
+            <p className="break-all font-mono text-sm font-semibold">{arquivo.pasta}{arquivo.nome}</p>
+            <p className="text-xs text-ink-2">{t.previa.origem(arquivo.aba)}</p>
+          </div>
+          <button ref={fecharRef} type="button" onClick={onFechar} aria-label={t.previa.fechar} className="rounded p-1 text-ink-2 hover:bg-page hover:text-ink">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="bg-page p-4">
+          {pdf ? (
+            <div className="mx-auto max-w-xl bg-white p-6 text-[#1b1f24] shadow-sm">
+              <p className="text-center text-base font-bold">{t.previa.titulo(arquivo.cliente)}</p>
+              <table className="mt-4 w-full border-collapse text-[11px]">
+                <thead>
+                  <tr className="bg-[#1f3a5f] text-white">
+                    {t.previa.cols.map((c, i) => (
+                      <th key={c} className={`border border-[#c8ccd4] px-1.5 py-1 font-semibold ${i >= 3 ? "text-right" : "text-left"}`}>{c}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {linhas.map((l, i) => (
+                    <tr key={l.codigo} className={i % 2 ? "bg-[#f4f6f9]" : ""}>
+                      <td className="border border-[#c8ccd4] px-1.5 py-1">{l.codigo}</td>
+                      <td className="border border-[#c8ccd4] px-1.5 py-1">{l.produto}</td>
+                      <td className="border border-[#c8ccd4] px-1.5 py-1">{l.unidade}</td>
+                      <td className="border border-[#c8ccd4] px-1.5 py-1 text-right">{brl(l.preco, lang)}</td>
+                      <td className="border border-[#c8ccd4] px-1.5 py-1 text-right font-semibold">{brl(l.precoCliente, lang)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="overflow-hidden rounded border border-[#c8ccd4] bg-white text-[11px] text-[#1b1f24]">
+              <div className="flex items-center gap-2 border-b border-[#c8ccd4] bg-[#f3f3f3] px-2 py-1 font-mono text-[10px] text-[#555]">
+                <span className="rounded-sm bg-white px-1.5 py-0.5 shadow-sm">{arquivo.aba}</span>
+              </div>
+              <table className="w-full table-fixed border-collapse">
+                <colgroup>
+                  <col className="w-7" />
+                  <col className="w-[12%]" />
+                  <col />
+                  <col className="w-[10%]" />
+                  <col className="w-[17%]" />
+                  <col className="w-[19%]" />
+                </colgroup>
+                <thead>
+                  <tr className="bg-[#f3f3f3] text-[10px] text-[#555]">
+                    {["", "A", "B", "C", "D", "E"].map((c) => (
+                      <th key={c} className="border border-[#dcdcdc] py-0.5 font-normal">{c}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="border border-[#dcdcdc] bg-[#f3f3f3] text-center text-[10px] text-[#555]">1</td>
+                    {t.previa.cols.map((c, i) => (
+                      <td key={c} className={`truncate border border-[#dcdcdc] bg-[#1f3a5f] px-1 py-0.5 font-semibold text-white ${i >= 3 ? "text-right" : ""}`}>{c}</td>
+                    ))}
+                  </tr>
+                  {linhas.map((l, i) => (
+                    <tr key={l.codigo}>
+                      <td className="border border-[#dcdcdc] bg-[#f3f3f3] text-center text-[10px] text-[#555]">{i + 2}</td>
+                      <td className="truncate border border-[#dcdcdc] px-1 py-0.5">{l.codigo}</td>
+                      <td className="truncate border border-[#dcdcdc] px-1 py-0.5">{l.produto}</td>
+                      <td className="truncate border border-[#dcdcdc] px-1 py-0.5">{l.unidade}</td>
+                      <td className="truncate border border-[#dcdcdc] px-1 py-0.5 text-right">{brl(l.preco, lang)}</td>
+                      <td className="truncate border border-[#dcdcdc] px-1 py-0.5 text-right">{brl(l.precoCliente, lang)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-1 border-t border-line px-4 py-3 text-xs text-ink-2">
+          <p className="font-medium text-ink">{t.previa.desconto(pct)}</p>
+          <p>{pdf ? t.previa.pdfNota : t.previa.xlsxNota}</p>
+          <p className="text-muted">{t.previa.amostra}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Faq({ t }: { t: RemessaTexts }) {
+  return (
+    <section className="rounded-lg border border-line bg-surface p-4">
+      <h2 className="flex items-center gap-2 text-sm font-semibold">
+        <HelpCircle className="h-4 w-4 text-accent-strong" /> {t.faq.title}
+      </h2>
+      <div className="mt-3 grid gap-2 md:grid-cols-2">
+        {t.faq.itens.map((i) => (
+          <details key={i.q} open className="group rounded-md border border-line bg-page px-3 py-2">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-2 text-sm font-semibold">
+              {i.q}
+              <ChevronDown className="h-4 w-4 shrink-0 text-muted transition-transform group-open:rotate-180" />
+            </summary>
+            <p className="mt-1.5 text-xs leading-relaxed text-ink-2">{i.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
   );
 }
 

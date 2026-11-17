@@ -44,7 +44,7 @@ const pt = {
   },
   resumo: (env: number, err: number) =>
     `${env} ${env === 1 ? "enviado" : "enviados"}, ${err} com erro`,
-  pasta: (semana: string) => `Arquivos salvos em Envios/${semana}/`,
+  salvoEm: (pasta: string) => `Arquivos salvos em ${pasta}`,
   passos: ["Rode o envio", "Corrija as falhas", "Reenvie só as falhas"],
   passoAtual: "você está aqui",
   corrigirTitulo: "Corrija as falhas",
@@ -58,6 +58,46 @@ const pt = {
   colsCurtas: { cliente: "cliente / aba", arquivo: "arquivo / canal", destinatario: "destinatário", optin: "optin_whatsapp" },
   logColsCurtas: { quando: "data_hora / execução", cliente: "cliente / canal", arquivo: "arquivo", status: "status / motivo" },
   canalNome: { email: "e-mail", whatsapp: "WhatsApp" },
+  comoFunciona: {
+    title: "Como funciona",
+    lead: "O Remessa é uma ferramenta que trabalha em cima da planilha que você já usa. Ninguém exporta, anexa ou arrasta arquivo: ele gera o PDF ou o Excel de cada cliente sozinho e envia.",
+    etapas: [
+      { t: "Sua planilha", d: "Você atualiza a aba ORIGEM com os preços da semana. A aba de cada cliente se atualiza por fórmula." },
+      { t: "Um clique", d: "Botão Enviar na aba PAINEL da planilha. Abre uma janela com o progresso; sem terminal. Ou agendado toda semana." },
+      { t: "Gera os arquivos", d: "Para cada linha da CONTROLE, cria o PDF ou o Excel a partir da aba daquele cliente." },
+      { t: "Salva na pasta da semana", d: "Envios/2026-S47/ guarda o histórico de tudo o que foi enviado." },
+      { t: "Envia e registra", d: "Anexa ao e-mail ou ao WhatsApp (API oficial) e anota o resultado na aba LOG." },
+    ],
+    agora: "agora",
+  },
+  pasta: {
+    title: "Pasta de envios",
+    hint: "No seu computador ou na rede da empresa. Os arquivos aparecem aqui conforme o Remessa os gera; clique em um para ver o conteúdo.",
+    vazia: "A pasta ainda está vazia. Clique em \"Rodar envio\": cada arquivo aparece aqui no momento em que é gerado.",
+    gerado: "gerado",
+    enviadoPor: (canal: string) => `anexado e enviado por ${canal}`,
+    semArquivo: "Clientes com erro na validação não geram arquivo: nada sai com dado errado.",
+    ver: "ver arquivo",
+  },
+  previa: {
+    origem: (aba: string) => `Gerado automaticamente a partir da aba ${aba} da planilha`,
+    titulo: (cliente: string) => `Tabela de preços – ${cliente}`,
+    desconto: (pct: string) => `Desconto do cliente: ${pct} (definido na aba do cliente)`,
+    cols: ["Código", "Produto", "Unid.", "Preço base", "Preço cliente"],
+    amostra: "Amostra de 8 produtos. O arquivo real traz a tabela completa.",
+    pdfNota: "PDF: respeita a área de impressão da aba.",
+    xlsxNota: "Excel: só a aba do cliente, com valores (sem fórmulas nem vínculos com a planilha original).",
+    fechar: "Fechar",
+  },
+  faq: {
+    title: "Perguntas frequentes",
+    itens: [
+      { q: "É uma planilha ou uma ferramenta?", a: "Uma ferramenta (um programa) que trabalha em cima da sua planilha. A planilha continua sendo onde você trabalha: preços, lista de clientes, botões e o histórico de envios. O Remessa faz o trabalho pesado: calcula, gera os arquivos, envia e registra." },
+      { q: "Como o usuário roda?", a: "Pela própria planilha. A aba PAINEL tem três botões: Testar envio, Enviar e Reenviar falhas. Ao clicar, abre uma janela que mostra cada cliente sendo processado e o resumo no final. Não precisa de terminal nem de programação. Também dá para agendar para rodar sozinho toda semana." },
+      { q: "De onde vêm os PDFs e as planilhas enviados?", a: "São gerados pela ferramenta, a partir da aba de cada cliente, no momento do envio. Ficam salvos numa pasta por semana (Envios/2026-S47/), que serve de histórico." },
+      { q: "Precisa instalar algo?", a: "Só no computador que faz os envios, na implantação. A equipe continua usando o Excel normalmente; quem só consulta a planilha não precisa de nada." },
+    ],
+  },
   conformidade: {
     title: "Conformidade com a Meta",
     itens: [
@@ -120,7 +160,7 @@ const en: RemessaTexts = {
   },
   resumo: (env: number, err: number) =>
     `${env} sent, ${err} with errors`,
-  pasta: (semana: string) => `Files saved to Envios/${semana}/`,
+  salvoEm: (pasta: string) => `Files saved to ${pasta}`,
   passos: ["Run the batch", "Fix the failures", "Retry only the failures"],
   passoAtual: "you are here",
   corrigirTitulo: "Fix the failures",
@@ -134,6 +174,46 @@ const en: RemessaTexts = {
   colsCurtas: { cliente: "customer / sheet", arquivo: "file / channel", destinatario: "recipient", optin: "optin_whatsapp" },
   logColsCurtas: { quando: "timestamp / run", cliente: "customer / channel", arquivo: "file", status: "status / reason" },
   canalNome: { email: "e-mail", whatsapp: "WhatsApp" },
+  comoFunciona: {
+    title: "How it works",
+    lead: "Remessa is a tool that works on top of the spreadsheet you already use. Nobody exports, attaches or drags files: it builds each customer's PDF or Excel file by itself and sends it.",
+    etapas: [
+      { t: "Your spreadsheet", d: "You update the ORIGIN sheet with this week's prices. Each customer's sheet updates through formulas." },
+      { t: "One click", d: "Send button on the PAINEL sheet. A window shows the progress; no terminal. Or scheduled every week." },
+      { t: "Builds the files", d: "For each CONTROL row, creates the PDF or Excel file from that customer's sheet." },
+      { t: "Saves to the week folder", d: "Envios/2026-S47/ keeps a history of everything that was sent." },
+      { t: "Sends and logs", d: "Attaches it to the e-mail or WhatsApp (official API) and records the result in the LOG sheet." },
+    ],
+    agora: "now",
+  },
+  pasta: {
+    title: "Delivery folder",
+    hint: "On your computer or the company network. Files appear here as Remessa builds them; click one to see its content.",
+    vazia: "The folder is still empty. Click \"Run batch\": each file shows up here the moment it is built.",
+    gerado: "built",
+    enviadoPor: (canal: string) => `attached and sent by ${canal}`,
+    semArquivo: "Customers that fail validation get no file: nothing goes out with wrong data.",
+    ver: "view file",
+  },
+  previa: {
+    origem: (aba: string) => `Built automatically from the ${aba} sheet of the spreadsheet`,
+    titulo: (cliente: string) => `Price list – ${cliente}`,
+    desconto: (pct: string) => `Customer discount: ${pct} (set in the customer sheet)`,
+    cols: ["Code", "Product", "Unit", "Base price", "Customer price"],
+    amostra: "Sample of 8 products. The real file has the full table.",
+    pdfNota: "PDF: follows the sheet's print area.",
+    xlsxNota: "Excel: only the customer's sheet, with values (no formulas or links to the original workbook).",
+    fechar: "Close",
+  },
+  faq: {
+    title: "Frequently asked questions",
+    itens: [
+      { q: "Is it a spreadsheet or a tool?", a: "A tool (a program) that works on top of your spreadsheet. The spreadsheet is still where you work: prices, customer list, buttons and the delivery history. Remessa does the heavy lifting: calculates, builds the files, sends and logs." },
+      { q: "How does the user run it?", a: "From the spreadsheet itself. The PAINEL sheet has three buttons: Test, Send and Retry failures. Clicking one opens a window that shows each customer being processed and a summary at the end. No terminal, no coding. It can also be scheduled to run by itself every week." },
+      { q: "Where do the PDFs and spreadsheets that get sent come from?", a: "The tool builds them from each customer's sheet at send time. They are saved in a weekly folder (Envios/2026-S47/), which works as a history." },
+      { q: "Does anything need to be installed?", a: "Only on the computer that does the sending, during setup. The team keeps using Excel as usual; people who only look at the spreadsheet need nothing." },
+    ],
+  },
   conformidade: {
     title: "Meta compliance",
     itens: [
