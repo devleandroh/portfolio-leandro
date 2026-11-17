@@ -59,17 +59,18 @@ const todayIso = () => anchorDate().toISOString().slice(0, 10);
 
 /** Lê uma view inteira, paginando de 1000 em 1000 (limite padrão da API). */
 async function fetchAll<T>(sb: SupabaseClient, view: string, columns: string, orderBy: string): Promise<T[]> {
-  const { count, error } = await sb.from(view).select(orderBy, { count: "exact", head: true });
-  if (error) throw new Error(`${view}: ${error.message}`);
+  const { count, error, status } = await sb.from(view).select(orderBy, { count: "exact", head: true });
+  // Requisições HEAD não têm corpo: sem o status HTTP a mensagem de erro chega vazia.
+  if (error) throw new Error(`${view}: HTTP ${status} ${error.code ?? ""} ${error.message ?? ""}`.trim());
   const total = count ?? 0;
   const pages = await Promise.all(
     Array.from({ length: Math.ceil(total / PAGE_SIZE) }, async (_, i) => {
-      const { data, error: e } = await sb
+      const { data, error: e, status } = await sb
         .from(view)
         .select(columns)
         .order(orderBy)
         .range(i * PAGE_SIZE, (i + 1) * PAGE_SIZE - 1);
-      if (e) throw new Error(`${view}: ${e.message}`);
+      if (e) throw new Error(`${view}: HTTP ${status} ${e.code ?? ""} ${e.message ?? ""}`.trim());
       return (data ?? []) as T[];
     }),
   );
