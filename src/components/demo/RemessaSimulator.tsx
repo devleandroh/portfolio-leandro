@@ -1,11 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   ArrowRight, Check, CheckCircle2, ChevronDown, FileSpreadsheet, FileText, FolderOpen, HelpCircle, Mail, MessageCircle, MousePointerClick,
   Play, RotateCcw, Send, ShieldCheck, Table2, Trash2, Wrench, X, XCircle,
 } from "lucide-react";
 import { remessaTexts, type RemessaTexts } from "@/i18n/remessa";
+import { Grade, Planilhao, abaCliente, montarAbas, type AcaoPainel } from "./Planilhao";
 import type { Locale } from "@/i18n/config";
 import {
   CONTROLE_INICIAL, DATA_OPTIN_DEMO, EMAIL_CORRIGIDO, mascarar, pastaEnvio, planejarLote, resumir, tabelaCliente, validar, type Canal,
@@ -57,6 +59,8 @@ export function RemessaSimulator({ lang }: { lang: Locale }) {
   const [arquivos, setArquivos] = useState<Arquivo[]>([]);
   const [previa, setPrevia] = useState<Arquivo | null>(null);
   const fecharPrevia = useCallback(() => setPrevia(null), []);
+  const [abaAtiva, setAbaAtiva] = useState("PAINEL");
+  const [novidades, setNovidades] = useState<Set<string>>(new Set());
   const [falhas, setFalhas] = useState<Falha[]>([]);
   const [destaque, setDestaque] = useState<number | null>(null);
   const execRef = useRef(0);
@@ -83,14 +87,14 @@ export function RemessaSimulator({ lang }: { lang: Locale }) {
   const etapaAtual = rodando ? log[0]?.etapa : undefined;
   const fases = etapaAtual === "gerando" ? [2, 3] : etapaAtual === "enviando" ? [4] : [];
 
-  async function executar(apenas?: ReadonlySet<number>) {
-    const lote = planejarLote(controle, { teste, apenas });
+  async function executar(apenas?: ReadonlySet<number>, modoTeste: boolean = teste) {
+    const lote = planejarLote(controle, { teste: modoTeste, apenas });
     if (lote.length === 0) return;
     setRodando(true);
     execRef.current += 1;
     const execucao = `exec-${String(execRef.current).padStart(4, "0")}`;
     const atualizar = (key: string, etapa: Etapa) => setLog((l) => l.map((r) => (r.key === key ? { ...r, etapa } : r)));
-    const pasta = pastaEnvio(teste);
+    const pasta = pastaEnvio(modoTeste);
     const gravarArquivo = (item: ItemLote, enviado: boolean) =>
       setArquivos((lista) => {
         const arq: Arquivo = {
@@ -104,7 +108,7 @@ export function RemessaSimulator({ lang }: { lang: Locale }) {
     for (const item of lote) {
       if (!vivo.current) return;
       const key = `${execucao}-${item.linha.id}`;
-      setLog((l) => [novaLinha(key, execucao, item, teste), ...l]);
+      setLog((l) => [novaLinha(key, execucao, item, modoTeste), ...l]);
       await espera(PASSO_MS * 1.4);
       if (item.motivo) {
         atualizar(key, "erro"); // validação falhou: nenhum arquivo é gerado
@@ -116,6 +120,7 @@ export function RemessaSimulator({ lang }: { lang: Locale }) {
       gravarArquivo(item, true);
       atualizar(key, "enviado");
     }
+    setNovidades((n) => new Set(n).add("LOG"));
     if (!vivo.current) return;
     const novasFalhas = lote.filter((i) => i.motivo).map((i) => ({ id: i.linha.id, cliente: i.linha.cliente, motivo: i.motivo as Motivo }));
     setResumo({ ...resumir(lote), pasta });
@@ -145,12 +150,56 @@ export function RemessaSimulator({ lang }: { lang: Locale }) {
     setResumo(null);
     setFalhas([]);
     setArquivos([]);
+    setNovidades(new Set());
     execRef.current = 0;
   }
+
+  const abas = montarAbas(
+    controle,
+    [...log].reverse().filter((r) => r.etapa === "enviado" || r.etapa === "erro").map((r) => ({
+      dataHora: r.hora, modo: r.teste ? "teste" : "real", cliente: r.cliente, canal: r.canal, arquivo: r.etapa === "erro" ? "" : r.arquivo,
+      status: r.etapa === "erro" ? "erro" : "enviado", erro: r.motivo && r.etapa === "erro" ? remessaTexts.pt.motivos[r.motivo] : "",
+    })),
+    idsComErro,
+    lang,
+  );
+
+  function trocarAba(nome: string) {
+    setAbaAtiva(nome);
+    setNovidades((n) => {
+      const novo = new Set(n);
+      novo.delete(nome);
+      return novo;
+    });
+  }
+
+  function acaoPainel(a: AcaoPainel) {
+    if (a === "testar" || a === "enviar") {
+      setTeste(a === "testar");
+      void executar(undefined, a === "testar");
+    } else if (falhas.length && !pendentes.length) {
+      void executar(new Set(falhas.map((f) => f.id)));
+    }
+  }
+
+  const verAba = useCallback((aba: string) => {
+    setPrevia(null);
+    setAbaAtiva(aba);
+    requestAnimationFrame(() => document.getElementById("planilha")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  }, []);
 
   return (
     <div className="space-y-4">
     <ComoFunciona t={t} fases={fases} />
+    <Planilhao
+      t={t}
+      abas={abas}
+      abaAtiva={abaAtiva}
+      onTrocarAba={trocarAba}
+      onAcao={acaoPainel}
+      acoesHabilitadas={{ testar: !rodando, enviar: !rodando, reenviar: !rodando && falhas.length > 0 && pendentes.length === 0 }}
+      abasComNovidade={novidades}
+    />
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_300px]">
       <div className="min-w-0 space-y-4">
         <Guia passos={t.passos} atual={passo} rotuloAtual={t.passoAtual} />
@@ -340,7 +389,7 @@ export function RemessaSimulator({ lang }: { lang: Locale }) {
       </aside>
     </div>
     <Faq t={t} />
-    {previa && <Previa t={t} lang={lang} arquivo={previa} onFechar={fecharPrevia} />}
+    {previa && <Previa t={t} lang={lang} arquivo={previa} onFechar={fecharPrevia} onVerAba={verAba} />}
     </div>
   );
 }
@@ -449,7 +498,9 @@ function PastaEnvios({
 
 const brl = (v: number, lang: string) => v.toLocaleString(lang === "en" ? "en-US" : "pt-BR", { style: "currency", currency: "BRL" });
 
-function Previa({ t, lang, arquivo, onFechar }: { t: RemessaTexts; lang: Locale; arquivo: Arquivo; onFechar: () => void }) {
+function Previa({
+  t, lang, arquivo, onFechar, onVerAba,
+}: { t: RemessaTexts; lang: Locale; arquivo: Arquivo; onFechar: () => void; onVerAba: (aba: string) => void }) {
   const { desconto, linhas } = tabelaCliente(arquivo.aba);
   const pct = `${(desconto * 100).toLocaleString(lang === "en" ? "en-US" : "pt-BR")}%`;
   const fecharRef = useRef<HTMLButtonElement>(null);
@@ -462,14 +513,14 @@ function Previa({ t, lang, arquivo, onFechar }: { t: RemessaTexts; lang: Locale;
   }, [onFechar]);
 
   const pdf = arquivo.formato === "PDF";
-  return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-ink/50 p-4" onClick={onFechar} role="presentation">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/50 p-3 sm:p-6" onClick={onFechar} role="presentation">
       <div
         role="dialog"
         aria-modal="true"
         aria-label={arquivo.nome}
         onClick={(e) => e.stopPropagation()}
-        className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg border border-line bg-surface shadow-xl"
+        className="flex max-h-[calc(100dvh-1.5rem)] w-full max-w-3xl flex-col overflow-hidden rounded-lg border border-line bg-surface shadow-xl sm:max-h-[calc(100dvh-3rem)]"
       >
         <div className="flex items-start gap-3 border-b border-line px-4 py-3">
           {pdf ? <FileText className="mt-0.5 h-5 w-5 shrink-0 text-critical" /> : <FileSpreadsheet className="mt-0.5 h-5 w-5 shrink-0 text-good" />}
@@ -482,7 +533,7 @@ function Previa({ t, lang, arquivo, onFechar }: { t: RemessaTexts; lang: Locale;
           </button>
         </div>
 
-        <div className="bg-page p-4">
+        <div className="min-h-0 flex-1 overflow-auto bg-page p-3 sm:p-4">
           {pdf ? (
             <div className="mx-auto max-w-xl bg-white p-6 text-[#1b1f24] shadow-sm">
               <p className="text-center text-base font-bold">{t.previa.titulo(arquivo.cliente)}</p>
@@ -508,45 +559,16 @@ function Previa({ t, lang, arquivo, onFechar }: { t: RemessaTexts; lang: Locale;
               </table>
             </div>
           ) : (
-            <div className="overflow-hidden rounded border border-[#c8ccd4] bg-white text-[11px] text-[#1b1f24]">
-              <div className="flex items-center gap-2 border-b border-[#c8ccd4] bg-[#f3f3f3] px-2 py-1 font-mono text-[10px] text-[#555]">
-                <span className="rounded-sm bg-white px-1.5 py-0.5 shadow-sm">{arquivo.aba}</span>
+            <div className="overflow-hidden rounded border border-[#c8ccd4]">
+              <div className="flex items-center gap-2 border-b border-[#c8ccd4] bg-[#217346] px-2 py-1 text-[11px] font-semibold text-white">
+                <FileSpreadsheet className="h-3.5 w-3.5" /> {arquivo.nome}
               </div>
-              <table className="w-full table-fixed border-collapse">
-                <colgroup>
-                  <col className="w-7" />
-                  <col className="w-[12%]" />
-                  <col />
-                  <col className="w-[10%]" />
-                  <col className="w-[17%]" />
-                  <col className="w-[19%]" />
-                </colgroup>
-                <thead>
-                  <tr className="bg-[#f3f3f3] text-[10px] text-[#555]">
-                    {["", "A", "B", "C", "D", "E"].map((c) => (
-                      <th key={c} className="border border-[#dcdcdc] py-0.5 font-normal">{c}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="border border-[#dcdcdc] bg-[#f3f3f3] text-center text-[10px] text-[#555]">1</td>
-                    {t.previa.cols.map((c, i) => (
-                      <td key={c} className={`truncate border border-[#dcdcdc] bg-[#1f3a5f] px-1 py-0.5 font-semibold text-white ${i >= 3 ? "text-right" : ""}`}>{c}</td>
-                    ))}
-                  </tr>
-                  {linhas.map((l, i) => (
-                    <tr key={l.codigo}>
-                      <td className="border border-[#dcdcdc] bg-[#f3f3f3] text-center text-[10px] text-[#555]">{i + 2}</td>
-                      <td className="truncate border border-[#dcdcdc] px-1 py-0.5">{l.codigo}</td>
-                      <td className="truncate border border-[#dcdcdc] px-1 py-0.5">{l.produto}</td>
-                      <td className="truncate border border-[#dcdcdc] px-1 py-0.5">{l.unidade}</td>
-                      <td className="truncate border border-[#dcdcdc] px-1 py-0.5 text-right">{brl(l.preco, lang)}</td>
-                      <td className="truncate border border-[#dcdcdc] px-1 py-0.5 text-right">{brl(l.precoCliente, lang)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className="overflow-x-auto sm:overflow-visible">
+                <Grade aba={abaCliente(arquivo.aba, arquivo.cliente, lang, true)} />
+              </div>
+              <div className="border-t border-[#c8ccd4] bg-[#f3f3f3] px-1 pt-1">
+                <span className="inline-block rounded-t-sm bg-white px-2.5 py-1 font-mono text-[11px] font-semibold text-[#217346] shadow-[inset_0_-2px_0_#217346]">{arquivo.aba}</span>
+              </div>
             </div>
           )}
         </div>
@@ -555,9 +577,13 @@ function Previa({ t, lang, arquivo, onFechar }: { t: RemessaTexts; lang: Locale;
           <p className="font-medium text-ink">{t.previa.desconto(pct)}</p>
           <p>{pdf ? t.previa.pdfNota : t.previa.xlsxNota}</p>
           <p className="text-muted">{t.previa.amostra}</p>
+          <button type="button" onClick={() => onVerAba(arquivo.aba)} className="pt-1 font-medium text-accent-strong hover:underline">
+            {t.planilha.verNaPlanilha} →
+          </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

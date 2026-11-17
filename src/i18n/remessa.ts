@@ -58,6 +58,20 @@ const pt = {
   colsCurtas: { cliente: "cliente / aba", arquivo: "arquivo / canal", destinatario: "destinatário", optin: "optin_whatsapp" },
   logColsCurtas: { quando: "data_hora / execução", cliente: "cliente / canal", arquivo: "arquivo", status: "status / motivo" },
   canalNome: { email: "e-mail", whatsapp: "WhatsApp" },
+  planilha: {
+    title: "A planilha do cliente (pasta de trabalho completa)",
+    hint: "É aqui que o cliente trabalha, no Excel. Clique nas abas embaixo para navegar e numa célula para ver a fórmula. Nesta demonstração, os botões da aba PAINEL rodam a ferramenta de verdade.",
+    arquivo: "precos_semana.xlsx",
+    mobileHint: "↔ arraste a planilha para o lado para ver todas as colunas",
+    abaDesc: {
+      PAINEL: "botões que rodam a ferramenta",
+      CONTROLE: "um cliente por linha: canal, formato e destino",
+      ORIGEM: "preços da semana: a única aba que você atualiza",
+      cliente: "tabela do cliente, calculada por fórmula a partir da ORIGEM",
+      LOG: "preenchida pela ferramenta a cada envio",
+    },
+    verNaPlanilha: "ver a aba de origem na planilha",
+  },
   comoFunciona: {
     title: "Como funciona",
     lead: "O Remessa é uma ferramenta que trabalha em cima da planilha que você já usa. Ninguém exporta, anexa ou arrasta arquivo: ele gera o PDF ou o Excel de cada cliente sozinho e envia.",
@@ -174,6 +188,20 @@ const en: RemessaTexts = {
   colsCurtas: { cliente: "customer / sheet", arquivo: "file / channel", destinatario: "recipient", optin: "optin_whatsapp" },
   logColsCurtas: { quando: "timestamp / run", cliente: "customer / channel", arquivo: "file", status: "status / reason" },
   canalNome: { email: "e-mail", whatsapp: "WhatsApp" },
+  planilha: {
+    title: "The customer's spreadsheet (full workbook)",
+    hint: "This is where the customer works, in Excel. Click the tabs at the bottom to navigate and a cell to see its formula. In this demo, the buttons on the PAINEL sheet actually run the tool.",
+    arquivo: "precos_semana.xlsx",
+    mobileHint: "↔ drag the spreadsheet sideways to see every column",
+    abaDesc: {
+      PAINEL: "buttons that run the tool",
+      CONTROLE: "one customer per row: channel, format and recipient",
+      ORIGEM: "this week's prices: the only sheet you update",
+      cliente: "customer price list, calculated by formula from ORIGEM",
+      LOG: "filled in by the tool on every send",
+    },
+    verNaPlanilha: "see the source sheet in the spreadsheet",
+  },
   comoFunciona: {
     title: "How it works",
     lead: "Remessa is a tool that works on top of the spreadsheet you already use. Nobody exports, attaches or drags files: it builds each customer's PDF or Excel file by itself and sends it.",
