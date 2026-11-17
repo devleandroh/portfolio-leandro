@@ -1,4 +1,7 @@
 @import "tailwindcss";
+/* Identidade dark "dados & software": tokens + estilos da homepage (escopo .brand-page). */
+@import "./theme-tokens.css";
+@import "./brand.css";
 
 /*
  * Tokens de design. Paleta sóbria (tinta sobre papel), um único acento azul
@@ -34,6 +37,23 @@
 
   --color-night: #111110;
   --color-night-2: #1a1a19;
+
+  /* Aliases da identidade dark (ver theme-tokens.css). Nomes próprios para não
+     colidir com a paleta clara usada pelas demos. */
+  --color-navy-900: #040a16;
+  --color-navy-800: #06101f;
+  --color-navy-700: #0a1b33;
+  --color-navy-600: #0e2a4e;
+  --color-brand-600: #0b74e5;
+  --color-brand-500: #1e9bff;
+  --color-brand-400: #38bdf8;
+  --color-brand-300: #8ad4ff;
+  --color-signal-500: #00c85a;
+  --color-signal-400: #22e27a;
+  --color-signal-300: #7bf2b0;
+  --color-ice: #eaf2ff;
+  --color-ice-soft: #b9cce8;
+  --color-ice-muted: #8aa3c6;
 }
 
 :root {

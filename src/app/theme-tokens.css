@@ -1,0 +1,155 @@
+/* =========================================================================
+   Design tokens — identidade visual "dados & software" (Leandro Santos)
+   Derivados dos banners de Instagram/LinkedIn: navy profundo, neon azul→verde,
+   cards com glow, padrões de pontos e ondas.
+
+   Uso no Next.js:
+   1. Cole este arquivo em  src/app/theme-tokens.css
+   2. Importe em  src/app/globals.css:   @import "./theme-tokens.css";
+   3. Use via Tailwind (ver tailwind-theme.ts) ou direto: bg-[var(--bg-900)]
+   ========================================================================= */
+
+:root {
+  /* ---------- superfícies ---------- */
+  --bg-900: #040A16;              /* fundo base (body) */
+  --bg-800: #06101F;              /* seções alternadas */
+  --bg-700: #0A1B33;              /* cards sólidos */
+  --bg-600: #0E2A4E;              /* hover / destaque */
+  --surface:   rgba(10, 27, 51, .72);
+  --surface-2: rgba(7, 18, 36, .86);
+
+  /* ---------- marca ---------- */
+  --blue-600: #0B74E5;
+  --blue-500: #1E9BFF;            /* azul primário */
+  --blue-400: #38BDF8;            /* azul de borda/ícone */
+  --blue-300: #8AD4FF;            /* texto de apoio / eyebrow */
+  --green-500: #00C85A;           /* verde primário (sucesso, "depois") */
+  --green-400: #22E27A;           /* verde neon (ícones, checks) */
+  --green-300: #7BF2B0;
+
+  /* ---------- texto ---------- */
+  --text:   #EAF2FF;
+  --text-2: #B9CCE8;
+  --muted:  #8AA3C6;
+
+  /* ---------- linhas / bordas ---------- */
+  --line:        rgba(94, 169, 255, .16);
+  --line-2:      rgba(94, 169, 255, .34);
+  --line-green:  rgba(34, 226, 122, .38);
+
+  /* ---------- gradientes ---------- */
+  --grad-brand: linear-gradient(90deg, #1E9BFF 0%, #00C85A 100%);
+  --grad-text:  linear-gradient(90deg, #8AD4FF 0%, #22E27A 100%);
+  --grad-card:  linear-gradient(160deg, rgba(18,46,86,.80) 0%, rgba(7,18,36,.78) 100%);
+  --grad-page:
+    radial-gradient(1200px 700px at 78% -8%, #11386B 0%, transparent 60%),
+    radial-gradient(900px 600px at 0% 12%,  #0A2448 0%, transparent 55%),
+    linear-gradient(180deg, #040A16 0%, #061428 48%, #040A16 100%);
+
+  /* ---------- sombras / glow ---------- */
+  --glow-blue:  0 18px 50px -20px rgba(30, 155, 255, .65);
+  --glow-green: 0 18px 50px -20px rgba(0, 200, 90, .55);
+  --glow-soft:  0 1px 0 rgba(255,255,255,.05) inset, 0 24px 60px -32px rgba(0,0,0,.9);
+
+  /* ---------- raios ---------- */
+  --r-sm: 10px;  --r-md: 14px;  --r-lg: 20px;  --r-xl: 28px;
+
+  /* ---------- tipografia ---------- */
+  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+/* =========================================================================
+   PADRÕES DE FUNDO
+   ========================================================================= */
+
+/* fundo da página (aplicar no body ou num wrapper fixo) */
+.bg-brand       { background: var(--grad-page); }
+
+/* malha quadriculada sutil, esmaecida no topo */
+.bg-grid::after {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(138,212,255,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(138,212,255,.045) 1px, transparent 1px);
+  background-size: 68px 68px;
+  mask-image: radial-gradient(1000px 700px at 50% 0%, #000 0%, transparent 80%);
+}
+
+/* padrão de pontos dos banners (elemento decorativo absoluto) */
+.dots {
+  position: absolute; width: 150px; height: 110px; opacity: .5; pointer-events: none;
+  background-image: radial-gradient(circle, rgba(56,189,248,.55) 1.4px, transparent 1.4px);
+  background-size: 13px 13px;
+}
+
+/* =========================================================================
+   PRIMITIVAS DA IDENTIDADE
+   ========================================================================= */
+
+/* card padrão com glow no hover */
+.card-brand {
+  background: var(--grad-card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--glow-soft);
+  transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+.card-brand:hover {
+  transform: translateY(-4px);
+  border-color: var(--line-2);
+  box-shadow: var(--glow-soft), var(--glow-blue);
+}
+
+/* borda em gradiente (azul → verde) — usada no terminal do hero */
+.border-grad { position: relative; }
+.border-grad::before {
+  content: ""; position: absolute; inset: -1px; border-radius: inherit;
+  padding: 1px; pointer-events: none;
+  background: linear-gradient(140deg, rgba(56,189,248,.55), transparent 42%, rgba(34,226,122,.45));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+}
+
+/* palavra destacada na caixa neon (o "resultados" dos banners) */
+.mark {
+  display: inline-block; padding: .06em .36em; border-radius: 12px;
+  border: 2px solid var(--blue-400);
+  background: rgba(56,189,248,.10);
+  box-shadow: 0 0 28px rgba(56,189,248,.35), inset 0 0 18px rgba(56,189,248,.12);
+}
+
+/* texto em gradiente azul → verde */
+.text-grad {
+  background: var(--grad-text);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+/* botão primário em gradiente de marca */
+.btn-brand {
+  background: var(--grad-brand); color: #03121F; font-weight: 700;
+  border-radius: 999px; padding: 14px 26px;
+  box-shadow: var(--glow-blue);
+  transition: filter .25s ease, transform .25s ease;
+}
+.btn-brand:hover { filter: brightness(1.08); transform: translateY(-2px); }
+
+/* tag / chip monoespaçada */
+.tag-brand {
+  font-family: var(--mono); font-size: 11.5px;
+  padding: 6px 11px; border-radius: 999px;
+  border: 1px solid var(--line); color: var(--text-2);
+  background: rgba(56,189,248,.07);
+}
+
+/* tile de ícone */
+.icon-tile {
+  width: 50px; height: 50px; border-radius: var(--r-md);
+  display: grid; place-items: center; flex: none;
+  border: 1px solid var(--line-2); color: var(--blue-400);
+  background: linear-gradient(150deg, rgba(30,155,255,.18), rgba(7,18,36,.5));
+}
+.icon-tile--green {
+  border-color: var(--line-green); color: var(--green-400);
+  background: linear-gradient(150deg, rgba(0,200,90,.18), rgba(7,18,36,.5));
+}
