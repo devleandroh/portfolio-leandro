@@ -48,9 +48,30 @@ const pt = {
   home: {
     ctaCases: "Ver cases com demonstração",
     ctaContact: "Falar comigo",
+    /** Trecho do título (profile.headline) destacado na caixa neon. */
+    headlineMark: "planilhas",
+    checks: ["Mais eficiência na operação", "Dados confiáveis para decisões", "Processos mais simples e automáticos"],
+    pills: ["Engenharia de Dados", "Business Intelligence", "Automação de Processos", "Integração de Sistemas"],
+    beforeAfter: {
+      eyebrow: "o que muda na prática",
+      title: "Do trabalho manual ao processo automático.",
+      titleHl: "processo automático",
+      before: {
+        chip: "Antes",
+        title: "Horas por semana montando relatórios e enviando arquivos à mão",
+        text: "Planilhas espalhadas, números que mudam conforme quem fecha o mês e retrabalho a cada ciclo.",
+      },
+      after: {
+        chip: "Depois",
+        title: "Um clique: arquivos gerados, enviados e registrados",
+        text: "Rotina agendada, regras versionadas e log de execução — o mesmo número para todo mundo.",
+        flow: ["dados", "pdf / xlsx", "e-mail · chat", "registro"],
+      },
+    },
     about: {
       eyebrow: "Sobre",
       title: "Do dado bruto à decisão.",
+      titleHl: "decisão",
       text: "Trabalho na ponte entre operação e tecnologia: entendo o processo, organizo os dados que ele gera e construo a ferramenta que faltava — seja um pipeline, um dashboard ou uma aplicação completa.",
       steps: [
         { t: "Entender", d: "Mapear o processo e a pergunta que o dado precisa responder." },
@@ -62,6 +83,7 @@ const pt = {
     skills: {
       eyebrow: "Competências",
       title: "O que eu entrego.",
+      titleHl: "entrego",
       items: [
         {
           title: "Engenharia de dados",
@@ -88,6 +110,7 @@ const pt = {
     cases: {
       eyebrow: "Cases",
       title: "Projetos com demonstração funcional.",
+      titleHl: "demonstração funcional",
       text: "Cada case abre uma aplicação real com dados 100% fictícios. Os painéis de dados leem de um banco PostgreSQL (Supabase), e a demo do Remessa simula a automação direto no navegador.",
       openDemo: "Ver demonstração",
       details: "Detalhes do case",
@@ -98,12 +121,16 @@ const pt = {
     stack: {
       eyebrow: "Tecnologias",
       title: "Ferramentas do dia a dia.",
+      titleHl: "dia a dia",
       groups: { data: "Dados", apps: "Aplicações", platform: "Plataforma" },
       excel: "Excel avançado",
     },
     contact: {
       eyebrow: "Contato",
       title: "Tem um processo que vive em planilhas?",
+      titleHl: "vive em planilhas",
+      cta: "Vamos conversar sobre o seu projeto?",
+      noticeTitle: "Dados fictícios",
       text: "Conte o problema. Respondo com uma proposta de como estruturar os dados e o que pode ser entregue.",
       missing: "Entre em contato para conversarmos sobre seu projeto.",
       email: "E-mail",
@@ -452,9 +479,29 @@ const en: Dictionary = {
   home: {
     ctaCases: "See cases with live demos",
     ctaContact: "Get in touch",
+    headlineMark: "spreadsheets",
+    checks: ["More efficient operations", "Reliable data for decisions", "Simpler, automated processes"],
+    pills: ["Data Engineering", "Business Intelligence", "Process Automation", "Systems Integration"],
+    beforeAfter: {
+      eyebrow: "what changes in practice",
+      title: "From manual work to an automated process.",
+      titleHl: "automated process",
+      before: {
+        chip: "Before",
+        title: "Hours every week building reports and sending files by hand",
+        text: "Scattered spreadsheets, numbers that change depending on who closes the month, and rework every cycle.",
+      },
+      after: {
+        chip: "After",
+        title: "One click: files generated, sent and logged",
+        text: "Scheduled routine, versioned rules and an execution log — the same number for everyone.",
+        flow: ["data", "pdf / xlsx", "email · chat", "log"],
+      },
+    },
     about: {
       eyebrow: "About",
       title: "From raw data to decisions.",
+      titleHl: "decisions",
       text: "I work at the bridge between operations and technology: I understand the process, organize the data it generates and build the missing tool — whether a pipeline, a dashboard or a complete application.",
       steps: [
         { t: "Understand", d: "Map the process and the question the data needs to answer." },
@@ -466,6 +513,7 @@ const en: Dictionary = {
     skills: {
       eyebrow: "Skills",
       title: "What I deliver.",
+      titleHl: "deliver",
       items: [
         {
           title: "Data engineering",
@@ -492,6 +540,7 @@ const en: Dictionary = {
     cases: {
       eyebrow: "Cases",
       title: "Projects with working demos.",
+      titleHl: "working demos",
       text: "Each case opens a real application with 100% fictitious data. The data dashboards read from a PostgreSQL database (Supabase), and the Remessa demo simulates the automation right in the browser.",
       openDemo: "See demo",
       details: "Case details",
@@ -502,12 +551,16 @@ const en: Dictionary = {
     stack: {
       eyebrow: "Stack",
       title: "Everyday tools.",
+      titleHl: "tools",
       groups: { data: "Data", apps: "Applications", platform: "Platform" },
       excel: "Advanced Excel",
     },
     contact: {
       eyebrow: "Contact",
       title: "Got a process that lives in spreadsheets?",
+      titleHl: "lives in spreadsheets",
+      cta: "Shall we talk about your project?",
+      noticeTitle: "Fictitious data",
       text: "Tell me about the problem. I'll reply with a proposal for structuring the data and what can be delivered.",
       missing: "Get in touch to discuss your project.",
       email: "Email",
