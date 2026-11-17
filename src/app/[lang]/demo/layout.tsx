@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Database, HardDrive } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { DemoNav } from "@/components/demo/DemoNav";
+import { SourceBadge } from "@/components/demo/SourceBadge";
 import { LanguageSwitcher } from "@/components/site/LanguageSwitcher";
 import { Monogram } from "@/components/site/SiteHeader";
 import { hasLocale, localePath } from "@/i18n/config";
@@ -23,13 +24,11 @@ export default async function DemoLayout({ children, params }: LayoutProps<"/[la
             <span className="hidden sm:inline">{t.demo.back}</span>
           </Link>
           <div className="flex items-center gap-2">
-            <span
-              className="inline-flex items-center gap-1.5 rounded border border-line bg-page px-2 py-1 font-mono text-[11px] text-ink-2"
+            <SourceBadge
+              supabase={source === "supabase"}
+              label={source === "supabase" ? "PostgreSQL · Supabase" : t.demo.sourceLocalLabel}
               title={source === "supabase" ? t.demo.sourceSupabase : t.demo.sourceLocal}
-            >
-              {source === "supabase" ? <Database className="h-3.5 w-3.5 text-good" /> : <HardDrive className="h-3.5 w-3.5 text-muted" />}
-              {source === "supabase" ? "PostgreSQL · Supabase" : t.demo.sourceLocalLabel}
-            </span>
+            />
             <LanguageSwitcher lang={lang} label={t.language.label} names={t.language} />
           </div>
         </div>

@@ -18,6 +18,8 @@ export interface CaseStudy {
   stack: string[];
   entities: string[];
   pipeline: string[];
+  /** Texto acima da lista de entidades (senão, usa o texto padrão das demos com banco). */
+  entitiesText?: string;
   /** Etapas da arquitetura específicas do case (senão, usa as etapas padrão das demos). */
   architecture?: { t: string; d: string }[];
   /** Repositório com o código do case. */
@@ -28,7 +30,47 @@ export interface CaseStudy {
 
 const REPO_BANCO = "https://github.com/devleandroh/banco-360-pipeline";
 
+const STACK_REMESSA = ["Python", "xlwings", "openpyxl", "reportlab", "pywin32 (Outlook)", "smtplib", "WhatsApp Cloud API", "httpx", "pydantic", "typer", "rich", "pytest", "respx", "GitHub Actions"];
+
 const pt: CaseStudy[] = [
+  {
+    slug: "remessa",
+    index: "06",
+    name: "Remessa · Automação de envio de planilhas",
+    tagline: "Cada cliente recebe a sua planilha, no canal certo: PDF ou Excel por e-mail e WhatsApp, com um clique, log e reenvio só das falhas.",
+    demoHref: "/demo/remessa",
+    problem:
+      "Empresas que enviam tabelas de preço, relatórios ou extratos semanais a dezenas de clientes fazem tudo à mão: atualizam a aba de origem, conferem a aba de cada cliente, exportam PDF ou Excel um a um e anexam em e-mails e conversas. São horas por semana, e o risco de mandar o preço errado para o cliente errado é alto.",
+    solution:
+      "Uma automação acionada por um botão que, para cada linha de uma aba CONTROLE, recalcula a pasta de trabalho, gera o arquivo no formato do cliente, salva numa pasta por semana, envia pelo canal certo (Outlook, SMTP ou a API oficial do WhatsApp) com mensagem personalizada e registra o resultado na aba LOG.",
+    outcome: [
+      "Um lote de dezenas de clientes sai em minutos, com resumo final: \"28 enviados, 2 com erro (motivo)\".",
+      "Modo de teste: tudo é gerado e validado, mas enviado só para o próprio usuário conferir antes do disparo real.",
+      "WhatsApp dentro das regras da Meta: Cloud API oficial, template aprovado e opt-in registrado por cliente.",
+    ],
+    features: [
+      "Aba CONTROLE validada antes do envio: adicionar um cliente é preencher uma linha",
+      "PDF da área de impressão ou .xlsx só com a aba do cliente, convertida em valores",
+      "E-mail via Outlook (COM) ou SMTP, com detecção do \"novo Outlook\"",
+      "WhatsApp Cloud API: upload do arquivo e template com cabeçalho de documento",
+      "Opt-in e opt-out por cliente; linhas sem opt-in são bloqueadas e registradas",
+      "Erros não travam o lote; \"reenviar falhas\" processa só o que falhou, sem duplicar",
+      "Execução por botão na planilha, .bat ou Agendador de Tarefas do Windows",
+      "Roda com ou sem Excel instalado; 26 testes (pytest + respx) e CI no GitHub Actions",
+    ],
+    stack: STACK_REMESSA,
+    entitiesText: "Abas da planilha e arquivos que a automação lê e grava:",
+    entities: ["ORIGEM", "abas dos clientes", "CONTROLE", "LOG", "config.yaml", ".env", "Envios/AAAA-Sxx/", "logs/*.jsonl"],
+    pipeline: ["Planilha Excel", "Arquivo por cliente", "E-mail e WhatsApp", "LOG"],
+    architecture: [
+      { t: "Planilha", d: "Aba de origem com os preços, uma aba por cliente puxando por fórmula, a aba CONTROLE e a aba LOG." },
+      { t: "Leitura e validação", d: "pydantic valida cada linha da CONTROLE (formato, canal, destinatário, opt-in) antes de gerar qualquer arquivo." },
+      { t: "Geração dos arquivos", d: "Com Excel: xlwings recalcula (fórmulas e Power Query) e exporta. Sem Excel: openpyxl + avaliação de fórmulas + reportlab." },
+      { t: "Canais", d: "Interface única Canal.enviar(): Outlook (pywin32), SMTP (smtplib) e WhatsApp Cloud API (httpx, Graph API)." },
+      { t: "Log e reenvio", d: "Cada envio vai para a aba LOG e para logs/AAAA-MM-DD.jsonl; o ID da execução evita envio duplicado." },
+      { t: "Operação", d: "Pacote Python remessa com CLI (typer + rich): remessa rodar | testar | reenviar-falhas | validar; credenciais só no .env." },
+    ],
+  },
   {
     slug: "banco-360",
     index: "05",
@@ -156,6 +198,44 @@ const pt: CaseStudy[] = [
 ];
 
 const en: CaseStudy[] = [
+  {
+    slug: "remessa",
+    index: "06",
+    name: "Remessa · Spreadsheet delivery automation",
+    tagline: "Every customer gets their own spreadsheet, on the right channel: PDF or Excel by e-mail and WhatsApp, in one click, with a log and retry of failures only.",
+    demoHref: "/demo/remessa",
+    problem:
+      "Companies that send weekly price lists, reports or statements to dozens of customers do it all by hand: update the source sheet, check each customer's sheet, export PDF or Excel one by one and attach them to e-mails and chats. It takes hours every week, and the risk of sending the wrong prices to the wrong customer is high.",
+    solution:
+      "A one-click automation that, for each row of a CONTROL sheet, recalculates the workbook, builds the file in the customer's format, saves it in a weekly folder, sends it through the right channel (Outlook, SMTP or the official WhatsApp API) with a personalized message and records the result in the LOG sheet.",
+    outcome: [
+      "A batch of dozens of customers goes out in minutes, with a final summary: \"28 sent, 2 with errors (reason)\".",
+      "Test mode: everything is built and validated, but sent only to the user to check before the real run.",
+      "WhatsApp within Meta's rules: official Cloud API, approved template and opt-in recorded per customer.",
+    ],
+    features: [
+      "CONTROL sheet validated before sending: adding a customer means filling in one row",
+      "PDF of the print area, or an .xlsx with only the customer's sheet, converted to values",
+      "E-mail via Outlook (COM) or SMTP, detecting the \"new Outlook\"",
+      "WhatsApp Cloud API: file upload and a template with a document header",
+      "Per-customer opt-in and opt-out; rows without opt-in are blocked and logged",
+      "Errors never stop the batch; \"retry failures\" processes only what failed, with no duplicates",
+      "Run from a button in the workbook, a .bat file or Windows Task Scheduler",
+      "Runs with or without Excel installed; 26 tests (pytest + respx) and CI on GitHub Actions",
+    ],
+    stack: STACK_REMESSA,
+    entitiesText: "Workbook sheets and files the automation reads and writes:",
+    entities: ["ORIGEM (source)", "customer sheets", "CONTROLE (control)", "LOG", "config.yaml", ".env", "Envios/YYYY-Wxx/", "logs/*.jsonl"],
+    pipeline: ["Excel workbook", "File per customer", "E-mail and WhatsApp", "LOG"],
+    architecture: [
+      { t: "Workbook", d: "Source sheet with prices, one sheet per customer pulling via formulas, the CONTROL sheet and the LOG sheet." },
+      { t: "Reading and validation", d: "pydantic validates every CONTROL row (format, channel, recipient, opt-in) before any file is built." },
+      { t: "File generation", d: "With Excel: xlwings recalculates (formulas and Power Query) and exports. Without Excel: openpyxl + formula evaluation + reportlab." },
+      { t: "Channels", d: "A single Channel.send() interface: Outlook (pywin32), SMTP (smtplib) and WhatsApp Cloud API (httpx, Graph API)." },
+      { t: "Log and retry", d: "Every send goes to the LOG sheet and to logs/YYYY-MM-DD.jsonl; the run ID prevents duplicate sends." },
+      { t: "Operation", d: "Python package remessa with a CLI (typer + rich): remessa rodar | testar | reenviar-falhas | validar (run, test, retry failures, validate); credentials only in .env." },
+    ],
+  },
   {
     slug: "banco-360",
     index: "05",

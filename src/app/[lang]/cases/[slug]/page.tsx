@@ -92,7 +92,7 @@ export default async function CasePage({ params }: PageProps<"/[lang]/cases/[slu
             </div>
             <div>
               <H2>{t.dataModel}</H2>
-              <p className="mt-2 text-sm text-ink-2">{t.dataModelText}</p>
+              <p className="mt-2 text-sm text-ink-2">{c.entitiesText ?? t.dataModelText}</p>
               <div className="mt-4 flex flex-wrap gap-2">
                 {c.entities.map((e) => (
                   <span key={e} className="rounded border border-line bg-page px-2.5 py-1 font-mono text-xs">

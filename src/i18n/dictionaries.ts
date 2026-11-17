@@ -149,7 +149,7 @@ const pt = {
   demo: {
     back: "Voltar ao portfólio",
     navAria: "Demonstrações",
-    nav: { banco: "Banco 360", compras: "Fluxo Compras", faturamento: "Faturamento", juridico: "Legal BI" },
+    nav: { remessa: "Remessa", banco: "Banco 360", compras: "Fluxo Compras", faturamento: "Faturamento", juridico: "Legal BI" },
     sourceSupabase: "Dados lidos do banco PostgreSQL (Supabase).",
     sourceLocal: "Banco não configurado: dados gerados localmente pelo mesmo algoritmo dos seeds.",
     sourceLocalLabel: "dados locais",
@@ -553,7 +553,7 @@ const en: Dictionary = {
   demo: {
     back: "Back to portfolio",
     navAria: "Demos",
-    nav: { banco: "Bank 360", compras: "Purchasing Flow", faturamento: "Billing", juridico: "Legal BI" },
+    nav: { remessa: "Remessa", banco: "Bank 360", compras: "Purchasing Flow", faturamento: "Billing", juridico: "Legal BI" },
     sourceSupabase: "Data read from the PostgreSQL database (Supabase).",
     sourceLocal: "Database not configured: data generated locally by the same algorithm as the seeds.",
     sourceLocalLabel: "local data",
