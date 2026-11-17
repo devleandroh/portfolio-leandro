@@ -14,9 +14,9 @@ const pt = {
   },
   profile: {
     role: "Engenharia de Dados · BI · Automação",
-    headline: "Transformo dados operacionais em decisões — e em software que as pessoas realmente usam.",
+    headline: "Automatizo os processos que hoje dependem de planilhas e trabalho manual.",
     summary:
-      "Construo pipelines, modelos de dados, dashboards e aplicações web que tiram informação de planilhas e sistemas legados e a colocam, confiável e atualizada, na frente de quem decide.",
+      "Relatórios, painéis e envios que tomavam horas da sua equipe passam a rodar sozinhos, com dados confiáveis e sempre atualizados. Menos retrabalho, menos erro e mais clareza para decidir.",
     location: "Brasil · remoto",
     photoAlt: (name: string) => `Foto de ${name}`,
   },
@@ -418,9 +418,9 @@ const en: Dictionary = {
   },
   profile: {
     role: "Data Engineering · BI · Automation",
-    headline: "I turn operational data into decisions — and into software people actually use.",
+    headline: "I automate the processes that still depend on spreadsheets and manual work.",
     summary:
-      "I build pipelines, data models, dashboards and web applications that pull information out of spreadsheets and legacy systems and put it — reliable and up to date — in front of the people who make decisions.",
+      "Reports, dashboards and deliveries that used to take your team hours now run on their own, with reliable, always up-to-date data. Less rework, fewer errors and more clarity to decide.",
     location: "Brazil · remote",
     photoAlt: (name: string) => `Photo of ${name}`,
   },
