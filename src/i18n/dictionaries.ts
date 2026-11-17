@@ -88,7 +88,7 @@ const pt = {
     cases: {
       eyebrow: "Cases",
       title: "Projetos com demonstração funcional.",
-      text: "Cada case abre uma aplicação real com dados 100% fictícios — as três demos de dados rodam sobre PostgreSQL.",
+      text: "Cada case abre uma aplicação real com dados 100% fictícios. Os painéis de dados leem de um banco PostgreSQL (Supabase), e a demo do Remessa simula a automação direto no navegador.",
       openDemo: "Ver demonstração",
       details: "Detalhes do case",
       problem: "Problema",
@@ -492,7 +492,7 @@ const en: Dictionary = {
     cases: {
       eyebrow: "Cases",
       title: "Projects with working demos.",
-      text: "Each case opens a real application with 100% fictitious data — the three data demos run on PostgreSQL.",
+      text: "Each case opens a real application with 100% fictitious data. The data dashboards read from a PostgreSQL database (Supabase), and the Remessa demo simulates the automation right in the browser.",
       openDemo: "See demo",
       details: "Case details",
       problem: "Problem",
