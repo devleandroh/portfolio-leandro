@@ -3,6 +3,7 @@ import { contactLinks, getProfile } from "@/config/profile";
 import { localePath, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { LanguageSwitcher } from "@/components/site/LanguageSwitcher";
+import { HashLink } from "./HashLink";
 
 /** Cabeçalho da homepage na identidade dark. Mesmos links e âncoras do SiteHeader. */
 export function BrandHeader({ lang }: { lang: Locale }) {
@@ -27,14 +28,14 @@ export function BrandHeader({ lang }: { lang: Locale }) {
         </Link>
         <nav className="menu" aria-label={t.header.nav.cases}>
           {nav.map((n) => (
-            <Link key={n.href} href={localePath(lang, n.href)}>
+            <HashLink key={n.href} href={localePath(lang, n.href)}>
               {n.label}
-            </Link>
+            </HashLink>
           ))}
           <LanguageSwitcher lang={lang} label={t.language.label} names={t.language} tone="dark" />
-          <Link href={localePath(lang, "/#cases")} className="btn btn-primary">
+          <HashLink href={localePath(lang, "/#cases")} className="btn btn-primary">
             {t.header.cta}
-          </Link>
+          </HashLink>
         </nav>
       </div>
     </header>
