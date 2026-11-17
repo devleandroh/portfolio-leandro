@@ -11,16 +11,22 @@ export function LanguageSwitcher({
   lang,
   label,
   names,
+  tone = "light",
 }: {
   lang: Locale;
   label: string;
   names: Record<Locale, string>;
+  /** "dark" para a homepage na identidade escura. */
+  tone?: "light" | "dark";
 }) {
+  const dark = tone === "dark";
   const pathname = stripLocale(usePathname());
   const router = useRouter();
 
   return (
-    <nav aria-label={label} className="flex rounded-md border border-line bg-page p-0.5 font-mono text-[11px]">
+    <nav aria-label={label} className={`flex rounded-md border p-0.5 font-mono text-[11px] ${
+        dark ? "border-[var(--line-2)] bg-navy-900/60" : "border-line bg-page"
+      }`}>
       {locales.map((l) => {
         const active = l === lang;
         const href = localePath(l, pathname);
@@ -38,7 +44,13 @@ export function LanguageSwitcher({
               if (!active) router.push(`${href}${window.location.search}${window.location.hash}`, { scroll: false });
             }}
             className={`rounded px-2 py-1 uppercase transition-colors ${
-              active ? "bg-ink text-surface" : "text-ink-2 hover:text-ink"
+              dark
+                ? active
+                  ? "bg-brand-400/15 text-brand-300"
+                  : "text-ice-soft hover:text-ice"
+                : active
+                  ? "bg-ink text-surface"
+                  : "text-ink-2 hover:text-ink"
             }`}
           >
             {l}
