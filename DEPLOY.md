@@ -166,7 +166,8 @@ Variáveis vazias são simplesmente ocultadas no site.
 O site conta as próprias visitas e mostra os números em **`/pt/painel`** (ou `/painel`), protegido por senha.
 Não aparece em menus nem em buscadores, e as visitas do navegador em que você entrou no painel não contam.
 
-1. No **SQL Editor** do Supabase do portfólio, rode `supabase/migrations/20261118000100_visitas.sql`.
+1. No **SQL Editor** do Supabase do portfólio, rode `supabase/migrations/20261118000100_visitas.sql` e depois
+   `supabase/migrations/20261118000200_visitas_detalhes.sql` (estado, cidade, campanhas, navegador e últimas visitas).
 2. Defina a senha do painel (troque `SUA-SENHA`):
 
    ```sql
@@ -179,3 +180,7 @@ Não aparece em menus nem em buscadores, e as visitas do navegador em que você 
    (para testar localmente, use `TRACK_VISITS=1` no `.env.local`).
 
 Privacidade: não guarda IP nem cookies de visitante — cada visitante vira um hash (IP + navegador + mês).
+Estado e cidade são aproximados, resolvidos pela Vercel a partir do IP, que não é gravado.
+
+**LinkedIn e outros links:** o app do LinkedIn costuma esconder a origem. Ao divulgar, use links marcados,
+por exemplo `https://seu-dominio/?utm_source=linkedin&utm_campaign=post-banco360` (ou só `?ref=linkedin`).
