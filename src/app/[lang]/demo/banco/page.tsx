@@ -53,7 +53,7 @@ export default async function BancoPage({ params: route, searchParams }: PagePro
   return (
     <>
       <BancoTabs lang={lang} active="painel" />
-      <DemoHeader lang={lang} title={b.title} description={b.description} today={today} warning={warning} />
+      <DemoHeader lang={lang} title={b.title} description={b.description} today={today} warning={warning} guide="banco" />
 
       {ultima && (
         <Link

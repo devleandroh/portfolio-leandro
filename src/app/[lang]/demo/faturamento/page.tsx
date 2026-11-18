@@ -50,6 +50,7 @@ export default async function FaturamentoPage({ params: route, searchParams }: P
         description={f.description}
         today={today}
         warning={warning}
+        guide="faturamento"
       />
 
       <FilterBar

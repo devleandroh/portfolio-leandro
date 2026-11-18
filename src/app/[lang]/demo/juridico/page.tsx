@@ -53,6 +53,7 @@ export default async function JuridicoPage({ params: route, searchParams }: Page
         description={j.description}
         today={today}
         warning={warning}
+        guide="juridico"
       />
 
       <FilterBar

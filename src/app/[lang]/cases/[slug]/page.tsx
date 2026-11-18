@@ -106,7 +106,7 @@ export default async function CasePage({ params }: PageProps<"/[lang]/cases/[slu
           </div>
         </section>
 
-        <section className="mx-auto max-w-5xl px-4 py-14 sm:px-6">
+        <section id="arquitetura" className="mx-auto max-w-5xl scroll-mt-20 px-4 py-14 sm:px-6">
           <H2>{t.architecture}</H2>
           <p className="mt-2 max-w-2xl text-sm text-ink-2">
             {t.architectureText}

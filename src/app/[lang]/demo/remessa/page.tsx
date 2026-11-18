@@ -21,7 +21,7 @@ export default async function RemessaPage({ params }: PageProps<"/[lang]/demo/re
   const t = remessaTexts[lang];
   return (
     <>
-      <DemoHeader lang={lang} title={t.title} description={t.description} today={REFERENCIA} />
+      <DemoHeader lang={lang} title={t.title} description={t.description} today={REFERENCIA} guide="remessa" />
       <RemessaSimulator lang={lang} />
     </>
   );

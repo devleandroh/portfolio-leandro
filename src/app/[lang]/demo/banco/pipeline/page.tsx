@@ -53,7 +53,7 @@ export default async function BancoPipelinePage({ params: route }: PageProps<"/[
   return (
     <>
       <BancoTabs lang={lang} active="pipeline" />
-      <DemoHeader lang={lang} title={p.title} description={p.description} today={today} warning={warning} />
+      <DemoHeader lang={lang} title={p.title} description={p.description} today={today} warning={warning} guide="bancoPipeline" />
       {repo && (
         <a href={repo} target="_blank" rel="noreferrer" className="-mt-2 mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-accent-strong hover:underline">
           {p.repo} <ExternalLink className="h-3.5 w-3.5" />

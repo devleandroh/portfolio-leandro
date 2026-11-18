@@ -53,6 +53,7 @@ export default async function ComprasPage({ params: route, searchParams }: PageP
         description={c.description}
         today={today}
         warning={warning}
+        guide="compras"
       />
 
       <FilterBar
