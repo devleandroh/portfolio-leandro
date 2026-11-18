@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import { VisitTracker } from "@/components/site/VisitTracker";
 import { getProfile } from "@/config/profile";
 import { hasLocale, htmlLang, locales, ogLocale } from "@/i18n/config";
 import "../globals.css";
@@ -58,7 +59,10 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
   if (!hasLocale(lang)) notFound();
   return (
     <html lang={htmlLang[lang]} className={`${inter.variable} ${jetbrains.variable} h-full`}>
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        {children}
+        <VisitTracker />
+      </body>
     </html>
   );
 }

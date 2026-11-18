@@ -160,3 +160,22 @@ Variáveis vazias são simplesmente ocultadas no site.
 | Aviso “Banco de dados indisponível” | URL/chave incorretas, projeto Supabase pausado (plano Free pausa após inatividade) ou views não criadas |
 | Erro `permission denied` nas views | migration `..._views.sql` não executada (ela concede o `select` para `anon`) |
 | Contagens zeradas | seeds não executados |
+
+## Painel de visitas (privado)
+
+O site conta as próprias visitas e mostra os números em **`/pt/painel`** (ou `/painel`), protegido por senha.
+Não aparece em menus nem em buscadores, e as visitas do navegador em que você entrou no painel não contam.
+
+1. No **SQL Editor** do Supabase do portfólio, rode `supabase/migrations/20261118000100_visitas.sql`.
+2. Defina a senha do painel (troque `SUA-SENHA`):
+
+   ```sql
+   insert into visitas.config (chave_hash)
+   values (encode(sha256(convert_to('SUA-SENHA', 'UTF8')), 'hex'))
+   on conflict (id) do update set chave_hash = excluded.chave_hash;
+   ```
+
+3. Abra `/pt/painel`, entre com a senha e pronto. As visitas são registradas só no deploy de produção
+   (para testar localmente, use `TRACK_VISITS=1` no `.env.local`).
+
+Privacidade: não guarda IP nem cookies de visitante — cada visitante vira um hash (IP + navegador + mês).
