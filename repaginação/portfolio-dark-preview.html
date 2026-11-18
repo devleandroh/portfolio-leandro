@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leandro Santos — Engenharia de Dados · BI · Automação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   DESIGN TOKENS — identidade visual "dados & software"
+   ============================================================ */
+:root{
+  /* superfícies */
+  --bg-900:#040A16;
+  --bg-800:#06101F;
+  --bg-700:#0A1B33;
+  --bg-600:#0E2A4E;
+  --surface:rgba(10,27,51,.72);
+  --surface-2:rgba(7,18,36,.86);
+
+  /* marca */
+  --blue-600:#0B74E5;
+  --blue-500:#1E9BFF;
+  --blue-400:#38BDF8;
+  --blue-300:#8AD4FF;
+  --green-500:#00C85A;
+  --green-400:#22E27A;
+  --green-300:#7BF2B0;
+
+  /* texto */
+  --text:#EAF2FF;
+  --text-2:#B9CCE8;
+  --muted:#8AA3C6;
+
+  /* linhas */
+  --line:rgba(94,169,255,.16);
+  --line-2:rgba(94,169,255,.34);
+  --line-green:rgba(34,226,122,.38);
+
+  /* gradientes */
+  --grad-brand:linear-gradient(90deg,#1E9BFF 0%,#00C85A 100%);
+  --grad-page:radial-gradient(1200px 700px at 78% -8%, #11386B 0%, transparent 60%),
+              radial-gradient(900px 600px at 0% 12%, #0A2448 0%, transparent 55%),
+              linear-gradient(180deg,#040A16 0%,#061428 48%,#040A16 100%);
+  --grad-card:linear-gradient(160deg, rgba(18,46,86,.80) 0%, rgba(7,18,36,.78) 100%);
+  --grad-text:linear-gradient(90deg,#8AD4FF 0%,#22E27A 100%);
+
+  /* sombras / glow */
+  --glow-blue:0 18px 50px -20px rgba(30,155,255,.65);
+  --glow-green:0 18px 50px -20px rgba(0,200,90,.55);
+  --glow-soft:0 1px 0 rgba(255,255,255,.05) inset, 0 24px 60px -32px rgba(0,0,0,.9);
+
+  /* raios */
+  --r-sm:10px; --r-md:14px; --r-lg:20px; --r-xl:28px;
+
+  /* tipografia */
+  --font:'Inter',system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,"SF Mono",Menlo,monospace;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font);
+  background:var(--bg-900);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:-2;background:var(--grad-page);
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background-image:linear-gradient(rgba(138,212,255,.045) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(138,212,255,.045) 1px,transparent 1px);
+  background-size:68px 68px;
+  mask-image:radial-gradient(1000px 700px at 50% 0%,#000 0%,transparent 80%);
+}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+
+.wrap{width:min(1180px,92vw);margin-inline:auto}
+.section{padding:clamp(72px,9vw,120px) 0;position:relative}
+
+/* ---------- utilitários de marca ---------- */
+.dots{
+  position:absolute;width:150px;height:110px;opacity:.5;pointer-events:none;
+  background-image:radial-gradient(circle,rgba(56,189,248,.55) 1.4px,transparent 1.4px);
+  background-size:13px 13px;
+}
+.eyebrow{
+  font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--blue-300);display:flex;align-items:center;gap:10px;margin-bottom:16px;
+}
+.eyebrow::before{content:"";width:28px;height:2px;border-radius:2px;background:var(--grad-brand)}
+h2.title{
+  font-size:clamp(28px,4vw,44px);font-weight:800;letter-spacing:-.02em;line-height:1.1;
+}
+.grad{background:var(--grad-text);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:var(--text-2);font-size:clamp(15px,1.5vw,17px);line-height:1.65;max-width:62ch;margin-top:14px}
+
+/* marcador tipo "resultados" dos banners */
+.mark{
+  display:inline-block;padding:.06em .36em;border-radius:12px;
+  border:2px solid var(--blue-400);
+  background:rgba(56,189,248,.10);
+  box-shadow:0 0 28px rgba(56,189,248,.35), inset 0 0 18px rgba(56,189,248,.12);
+}
+
+.card{
+  background:var(--grad-card);
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  box-shadow:var(--glow-soft);
+  position:relative;
+  transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease;
+}
+.card:hover{transform:translateY(-4px);border-color:var(--line-2);box-shadow:var(--glow-soft),var(--glow-blue)}
+
+.icon-tile{
+  width:50px;height:50px;border-radius:var(--r-md);display:grid;place-items:center;
+  border:1px solid var(--line-2);
+  background:linear-gradient(150deg,rgba(30,155,255,.18),rgba(7,18,36,.5));
+  color:var(--blue-400);flex:none;
+}
+.icon-tile.green{border-color:var(--line-green);color:var(--green-400);
+  background:linear-gradient(150deg,rgba(0,200,90,.18),rgba(7,18,36,.5))}
+.icon-tile svg{width:24px;height:24px}
+
+.btn{
+  display:inline-flex;align-items:center;gap:10px;border-radius:999px;
+  padding:14px 26px;font-weight:600;font-size:15px;cursor:pointer;
+  border:1px solid transparent;transition:all .25s ease;
+}
+.btn svg{width:18px;height:18px}
+.btn-primary{background:var(--grad-brand);color:#03121F;font-weight:700;box-shadow:var(--glow-blue)}
+.btn-primary:hover{filter:brightness(1.08);transform:translateY(-2px)}
+.btn-ghost{border-color:var(--line-2);color:var(--text);background:rgba(10,27,51,.5)}
+.btn-ghost:hover{border-color:var(--blue-400);background:rgba(30,155,255,.12)}
+
+.tag{
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.03em;
+  padding:6px 11px;border-radius:999px;border:1px solid var(--line);
+  color:var(--text-2);background:rgba(56,189,248,.07);
+}
+
+/* ---------- NAV ---------- */
+header.nav{
+  position:sticky;top:0;z-index:50;
+  backdrop-filter:blur(14px);
+  background:rgba(4,10,22,.72);
+  border-bottom:1px solid var(--line);
+}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:70px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{
+  width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+  font-weight:900;font-size:17px;color:#03121F;background:var(--grad-brand);
+  box-shadow:var(--glow-blue);
+}
+.brand b{font-size:15.5px;font-weight:700;letter-spacing:-.01em}
+.brand span{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+.menu{display:flex;align-items:center;gap:30px}
+.menu a{font-size:14.5px;color:var(--text-2);transition:color .2s}
+.menu a:hover{color:var(--blue-300)}
+.menu .btn{padding:10px 20px;font-size:14px}
+.burger{display:none;background:none;border:1px solid var(--line-2);border-radius:10px;padding:8px;color:var(--text)}
+
+/* ---------- HERO ---------- */
+.hero{padding:clamp(56px,7vw,92px) 0 clamp(60px,8vw,100px);position:relative}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(32px,5vw,68px);align-items:center}
+.who{display:flex;align-items:center;gap:16px;margin-bottom:26px}
+.avatar{
+  width:64px;height:64px;border-radius:50%;border:2px solid var(--blue-400);
+  background:linear-gradient(150deg,#123763,#061428);display:grid;place-items:center;
+  font-weight:800;font-size:20px;color:var(--blue-300);box-shadow:0 0 0 5px rgba(56,189,248,.10),var(--glow-blue);
+}
+.who b{display:block;font-size:17px}
+.who span{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--blue-300)}
+h1{font-size:clamp(34px,5.2vw,58px);line-height:1.06;letter-spacing:-.03em;font-weight:800}
+.hero p.lead{margin-top:22px;font-size:clamp(15px,1.6vw,17.5px)}
+.hero-cta{display:flex;flex-wrap:wrap;gap:14px;margin-top:34px}
+.hero-meta{font-family:var(--mono);font-size:12.5px;color:var(--muted);margin-top:28px;letter-spacing:.05em}
+
+/* pills de serviço (banner 1) */
+.pills{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:46px}
+.pill{
+  padding:16px 14px;border-radius:var(--r-md);text-align:center;
+  border:1px solid var(--line);background:var(--grad-card);
+  display:flex;flex-direction:column;align-items:center;gap:9px;
+  transition:all .25s ease;
+}
+.pill:hover{border-color:var(--line-2);transform:translateY(-3px)}
+.pill svg{width:26px;height:26px;color:var(--blue-400)}
+.pill.g svg{color:var(--green-400)}
+.pill b{font-size:13.5px;font-weight:600;line-height:1.3}
+
+/* terminal de pipeline */
+.terminal{
+  border-radius:var(--r-xl);padding:22px;
+  background:linear-gradient(165deg,rgba(6,18,38,.96),rgba(3,9,20,.98));
+  border:1px solid var(--line-2);
+  box-shadow:0 0 0 1px rgba(56,189,248,.06),0 40px 90px -40px rgba(30,155,255,.6);
+  position:relative;
+}
+.terminal::before{
+  content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;pointer-events:none;
+  background:linear-gradient(140deg,rgba(56,189,248,.55),transparent 42%,rgba(34,226,122,.45));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+}
+.term-head{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:12.5px;color:var(--muted);margin-bottom:18px}
+.live{display:flex;align-items:center;gap:7px;color:var(--green-400)}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--green-400);box-shadow:0 0 12px var(--green-400);animation:blink 1.8s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.step{
+  border:1px solid var(--line);border-radius:var(--r-md);padding:13px 11px;
+  background:rgba(10,27,51,.55);position:relative;
+}
+.step em{font-family:var(--mono);font-size:10.5px;color:var(--blue-400);font-style:normal}
+.step b{display:block;font-size:13.5px;margin:5px 0 9px}
+.step ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+.step li{font-size:11.5px;color:var(--muted);line-height:1.35}
+.step:not(:last-child)::after{
+  content:"";position:absolute;top:50%;right:-8px;width:7px;height:7px;
+  border-top:1.5px solid var(--line-2);border-right:1.5px solid var(--line-2);
+  transform:translateY(-50%) rotate(45deg);
+}
+.term-foot{
+  margin-top:18px;padding-top:16px;border-top:1px solid var(--line);
+  font-family:var(--mono);font-size:12.5px;color:var(--text-2);
+}
+.term-foot .c{color:var(--green-400)}
+
+/* checks laterais do banner */
+.checks{display:flex;flex-direction:column;gap:14px;margin-top:22px}
+.check{display:flex;align-items:center;gap:11px;font-size:14px;color:var(--text-2)}
+.check svg{width:20px;height:20px;color:var(--green-400);flex:none}
+
+/* ---------- ANTES / DEPOIS ---------- */
+.ba{display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:stretch;margin-top:44px}
+.ba-card{padding:28px;border-radius:var(--r-lg);border:1px solid var(--line);background:var(--surface-2)}
+.ba-card.after{border-color:var(--line-green);box-shadow:var(--glow-green);background:linear-gradient(160deg,rgba(5,38,25,.75),rgba(6,18,36,.85))}
+.ba-chip{
+  display:inline-block;font-size:13px;font-weight:700;padding:7px 18px;border-radius:999px;margin-bottom:18px;
+  background:rgba(255,255,255,.07);color:var(--text-2);border:1px solid var(--line);
+}
+.ba-card.after .ba-chip{background:var(--green-500);color:#032012;border-color:transparent}
+.ba-card h3{font-size:19px;font-weight:700;line-height:1.35;margin-bottom:10px}
+.ba-card p{color:var(--muted);font-size:14px;line-height:1.6}
+.ba-flow{display:flex;align-items:center;gap:9px;margin-top:20px;flex-wrap:wrap}
+.ba-flow span{
+  font-family:var(--mono);font-size:11px;padding:6px 10px;border-radius:8px;
+  border:1px solid var(--line-green);color:var(--green-300);background:rgba(0,200,90,.08);
+}
+.ba-flow i{color:var(--green-400);font-style:normal}
+.ba-arrow{display:grid;place-items:center;color:var(--blue-400)}
+.ba-arrow svg{width:34px;height:34px}
+
+/* ---------- SOBRE / PASSOS ---------- */
+.steps4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:46px}
+.s4{padding:26px 22px;border-radius:var(--r-lg);border:1px solid var(--line);background:var(--grad-card);transition:all .25s}
+.s4:hover{border-color:var(--line-2);transform:translateY(-4px)}
+.s4 em{font-family:var(--mono);font-size:12px;font-style:normal;color:var(--blue-400)}
+.s4 h3{font-size:18px;margin:12px 0 10px;font-weight:700}
+.s4 p{font-size:14px;color:var(--muted);line-height:1.6}
+
+/* ---------- COMPETÊNCIAS ---------- */
+.skills{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:46px}
+.skill{padding:28px;display:flex;gap:18px}
+.skill h3{font-size:19px;font-weight:700;margin-bottom:9px}
+.skill p{font-size:14.5px;color:var(--muted);line-height:1.6}
+.skill .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+
+/* ---------- CASES ---------- */
+.cases{display:flex;flex-direction:column;gap:22px;margin-top:46px}
+.case{padding:clamp(24px,3vw,36px);overflow:hidden}
+.case-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap}
+.case-id{font-family:var(--mono);font-size:12px;color:var(--blue-400);letter-spacing:.12em}
+.case h3{font-size:clamp(22px,2.6vw,28px);font-weight:800;margin:8px 0 10px;letter-spacing:-.02em}
+.case .sub{color:var(--text-2);font-size:15px;line-height:1.6;max-width:70ch}
+.case-body{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:26px;padding-top:24px;border-top:1px solid var(--line)}
+.case-body h4{
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--green-400);margin-bottom:10px;
+}
+.case-body p,.case-body li{font-size:13.8px;color:var(--muted);line-height:1.6}
+.case-body ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.case-body li{padding-left:16px;position:relative}
+.case-body li::before{content:"";position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:2px;background:var(--grad-brand)}
+.case-foot{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;margin-top:26px}
+.case-foot .tags{display:flex;flex-wrap:wrap;gap:8px}
+.case-foot .acts{display:flex;gap:10px;flex-wrap:wrap}
+.case-foot .btn{padding:11px 20px;font-size:14px}
+
+/* ---------- TECNOLOGIAS ---------- */
+.tech{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:46px}
+.tech-col{padding:26px}
+.tech-col h3{font-size:13px;font-family:var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--blue-300);margin-bottom:18px}
+.tech-col .tags{display:flex;flex-wrap:wrap;gap:9px}
+
+/* ---------- CTA ---------- */
+.cta{
+  border-radius:var(--r-xl);padding:clamp(34px,5vw,60px);text-align:center;position:relative;overflow:hidden;
+  border:1px solid var(--line-2);
+  background:radial-gradient(700px 300px at 50% 0%,rgba(30,155,255,.22),transparent 70%),linear-gradient(160deg,rgba(14,42,78,.9),rgba(5,13,27,.95));
+  box-shadow:var(--glow-blue);
+}
+.cta h2{font-size:clamp(26px,3.6vw,42px);font-weight:800;letter-spacing:-.02em;line-height:1.15}
+.cta p{color:var(--text-2);margin:16px auto 32px;max-width:58ch;font-size:16px;line-height:1.6}
+.cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.cta .btn-primary{padding:17px 34px;font-size:16px}
+
+/* ---------- RODAPÉ ---------- */
+.notice{
+  display:flex;gap:14px;align-items:flex-start;max-width:720px;margin:48px auto 0;
+  padding:18px 22px;border-radius:var(--r-md);border:1px solid var(--line);background:rgba(10,27,51,.5);
+}
+.notice svg{width:22px;height:22px;color:var(--blue-400);flex:none;margin-top:1px}
+.notice p{font-size:13.5px;color:var(--muted);line-height:1.6}
+.notice b{color:var(--text-2)}
+footer{position:relative;margin-top:clamp(60px,8vw,100px)}
+.waves{display:block;width:100%;height:auto;margin-bottom:-6px}
+.foot-in{
+  border-top:1px solid var(--line);padding:28px 0;display:flex;justify-content:space-between;
+  gap:16px;flex-wrap:wrap;font-size:13.5px;color:var(--muted);background:var(--bg-900);
+}
+.foot-in a{color:var(--text-2)}
+.foot-in a:hover{color:var(--blue-300)}
+
+/* ---------- reveal ---------- */
+.rv{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
+.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}.live i{animation:none}}
+
+/* ---------- responsivo ---------- */
+@media (max-width:980px){
+  .hero-grid{grid-template-columns:1fr}
+  .skills,.tech,.steps4,.pills{grid-template-columns:repeat(2,1fr)}
+  .case-body{grid-template-columns:1fr}
+  .ba{grid-template-columns:1fr}
+  .ba-arrow{transform:rotate(90deg)}
+  .menu a:not(.btn){display:none}
+}
+@media (max-width:620px){
+  .steps{grid-template-columns:repeat(2,1fr)}
+  .step:not(:last-child)::after{display:none}
+  .pills,.steps4,.skills,.tech{grid-template-columns:1fr}
+  .who{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+
+<!-- ======================= NAV ======================= -->
+<header class="nav">
+  <div class="wrap nav-in">
+    <a href="#top" class="brand">
+      <div class="logo">L</div>
+      <div><b>Leandro Santos</b> <span>/ dados &amp; software</span></div>
+    </a>
+    <nav class="menu">
+      <a href="#cases">Cases</a>
+      <a href="#competencias">Competências</a>
+      <a href="#tecnologias">Tecnologias</a>
+      <a href="#contato">Contato</a>
+      <a href="#cases" class="btn btn-primary">Ver demos</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ======================= HERO ======================= -->
+<section class="hero" id="top">
+  <div class="dots" style="top:40px;right:2%"></div>
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="who">
+          <div class="avatar">LS</div>
+          <div>
+            <b>Leandro Santos</b>
+            <span>Engenharia de Dados · BI · Automação</span>
+          </div>
+        </div>
+        <h1>Transformo dados operacionais em <span class="mark">decisões</span> — e em software que as pessoas realmente usam.</h1>
+        <p class="lead">Construo pipelines, modelos de dados, dashboards e aplicações web que tiram informação de planilhas e sistemas legados e a colocam, confiável e atualizada, na frente de quem decide.</p>
+        <div class="hero-cta">
+          <a href="#cases" class="btn btn-primary">Ver cases com demonstração
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="#contato" class="btn btn-ghost">Falar comigo</a>
+        </div>
+        <div class="hero-meta">Brasil · remoto</div>
+      </div>
+
+      <div>
+        <div class="terminal">
+          <div class="term-head"><span>pipeline.yml</span><span class="live"><i></i>executando</span></div>
+          <div class="steps">
+            <div class="step"><em>01</em><b>Fontes</b><ul><li>ERP / sistemas</li><li>Planilhas</li><li>APIs e arquivos</li></ul></div>
+            <div class="step"><em>02</em><b>Ingestão</b><ul><li>Python · SQL</li><li>Agendamentos</li><li>Validação</li></ul></div>
+            <div class="step"><em>03</em><b>Modelo</b><ul><li>PostgreSQL</li><li>Views analíticas</li><li>Regras versionadas</li></ul></div>
+            <div class="step"><em>04</em><b>Entrega</b><ul><li>Dashboards</li><li>Aplicações web</li><li>Alertas</li></ul></div>
+          </div>
+          <div class="term-foot">$ dado bruto <span class="c">&#8594;</span> modelo confiável <span class="c">&#8594;</span> decisão</div>
+        </div>
+
+        <div class="checks">
+          <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Mais eficiência na operação</div>
+          <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Dados confiáveis para decisões</div>
+          <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Processos mais simples e automáticos</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pills rv">
+      <div class="pill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5.5" rx="8" ry="3"/><path d="M4 5.5v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/><path d="M4 11.5v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>
+        <b>Engenharia<br>de Dados</b>
+      </div>
+      <div class="pill g">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>
+        <b>Business<br>Intelligence</b>
+      </div>
+      <div class="pill g">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-1.8-.3 1.6 1.6 0 00-1 1.5V21a2 2 0 11-4 0v-.1A1.6 1.6 0 007 19.4a1.6 1.6 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.6 1.6 0 00.3-1.8 1.6 1.6 0 00-1.5-1H1a2 2 0 110-4h.1A1.6 1.6 0 002.6 7a1.6 1.6 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.6 1.6 0 001.8.3H7a1.6 1.6 0 001-1.5V1a2 2 0 114 0v.1a1.6 1.6 0 001 1.5 1.6 1.6 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.6 1.6 0 00-.3 1.8V7a1.6 1.6 0 001.5 1H21a2 2 0 110 4h-.1a1.6 1.6 0 00-1.5 1z" transform="scale(.86) translate(2 2)"/></svg>
+        <b>Automação<br>de Processos</b>
+      </div>
+      <div class="pill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17l-5-5 5-5M16 7l5 5-5 5"/></svg>
+        <b>Integração<br>de Sistemas</b>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= ANTES / DEPOIS ======================= -->
+<section class="section" id="antes-depois">
+  <div class="dots" style="top:10px;left:1%"></div>
+  <div class="wrap">
+    <div class="rv">
+      <div class="eyebrow">o que muda na prática</div>
+      <h2 class="title">Do trabalho manual ao <span class="grad">processo automático</span>.</h2>
+    </div>
+    <div class="ba rv">
+      <div class="ba-card">
+        <span class="ba-chip">Antes</span>
+        <h3>Horas por semana montando relatórios e enviando arquivos à mão</h3>
+        <p>Planilhas espalhadas, números que mudam conforme quem fecha o mês e retrabalho a cada ciclo.</p>
+      </div>
+      <div class="ba-arrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </div>
+      <div class="ba-card after">
+        <span class="ba-chip">Depois</span>
+        <h3>Um clique: arquivos gerados, enviados e registrados</h3>
+        <p>Rotina agendada, regras versionadas e log de execução — o mesmo número para todo mundo.</p>
+        <div class="ba-flow">
+          <span>dados</span><i>&#8594;</i><span>pdf / xlsx</span><i>&#8594;</i><span>e-mail · chat</span><i>&#8594;</i><span>registro</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= SOBRE ======================= -->
+<section class="section" id="sobre">
+  <div class="wrap">
+    <div class="rv">
+      <div class="eyebrow">método</div>
+      <h2 class="title">Do dado bruto à <span class="grad">decisão</span>.</h2>
+    </div>
+    <div class="steps4 rv">
+      <div class="s4"><em>01</em><h3>Entender</h3><p>Mapear o processo e a pergunta que o dado precisa responder.</p></div>
+      <div class="s4"><em>02</em><h3>Modelar</h3><p>Estruturar fontes em um modelo confiável, com regras explícitas.</p></div>
+      <div class="s4"><em>03</em><h3>Automatizar</h3><p>Tirar o trabalho manual do caminho e manter tudo atualizado.</p></div>
+      <div class="s4"><em>04</em><h3>Entregar</h3><p>Colocar a informação em uma interface simples para quem decide.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= COMPETÊNCIAS ======================= -->
+<section class="section" id="competencias">
+  <div class="dots" style="bottom:40px;right:0"></div>
+  <div class="wrap">
+    <div class="rv">
+      <div class="eyebrow">competências</div>
+      <h2 class="title">O que eu <span class="grad">entrego</span>.</h2>
+    </div>
+    <div class="skills rv">
+      <div class="card skill">
+        <div class="icon-tile">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5.5" rx="8" ry="3"/><path d="M4 5.5v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/><path d="M4 11.5v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>
+        </div>
+        <div>
+          <h3>Engenharia de dados</h3>
+          <p>Extração de sistemas e planilhas, limpeza, modelagem relacional e cargas automatizadas com validação.</p>
+          <div class="tags"><span class="tag">ETL / ELT</span><span class="tag">Modelagem</span><span class="tag">SQL</span></div>
+        </div>
+      </div>
+      <div class="card skill">
+        <div class="icon-tile green">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>
+        </div>
+        <div>
+          <h3>BI e dashboards</h3>
+          <p>Indicadores com regra clara, comparações entre períodos e painéis que respondem perguntas do negócio.</p>
+          <div class="tags"><span class="tag">KPIs</span><span class="tag">Análise temporal</span><span class="tag">Visualização</span></div>
+        </div>
+      </div>
+      <div class="card skill">
+        <div class="icon-tile green">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg>
+        </div>
+        <div>
+          <h3>Automação de processos</h3>
+          <p>Rotinas que eliminam trabalho manual repetitivo: consolidações, conferências, alertas e relatórios.</p>
+          <div class="tags"><span class="tag">Python</span><span class="tag">Agendamentos</span><span class="tag">Integrações</span></div>
+        </div>
+      </div>
+      <div class="card skill">
+        <div class="icon-tile">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17l-5-5 5-5M16 7l5 5-5 5"/></svg>
+        </div>
+        <div>
+          <h3>Aplicações orientadas a dados</h3>
+          <p>Sistemas web sob medida, do banco à interface, para acompanhar processos e operar sobre os dados.</p>
+          <div class="tags"><span class="tag">Next.js</span><span class="tag">APIs</span><span class="tag">PostgreSQL</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= CASES ======================= -->
+<section class="section" id="cases">
+  <div class="wrap">
+    <div class="rv">
+      <div class="eyebrow">cases</div>
+      <h2 class="title">Projetos com <span class="grad">demonstração funcional</span>.</h2>
+      <p class="lead">Três aplicações completas, construídas do banco à interface, com dados fictícios para demonstração.</p>
+    </div>
+
+    <div class="cases">
+      <!-- CASE 01 -->
+      <article class="card case rv">
+        <div class="case-top">
+          <div>
+            <div class="case-id">case / 01</div>
+            <h3>Compras 360</h3>
+            <p class="sub">Visibilidade do ciclo de compras, da solicitação à nota fiscal.</p>
+          </div>
+        </div>
+        <div class="case-body">
+          <div>
+            <h4>Problema</h4>
+            <p>Informações espalhadas em telas e planilhas: saber o status de uma compra exigia uma sequência de mensagens.</p>
+          </div>
+          <div>
+            <h4>Solução</h4>
+            <p>Painel com linha do tempo unificada, indicadores de volume e valor, tempo entre etapas e alertas de atraso.</p>
+          </div>
+          <div>
+            <h4>Principais funcionalidades</h4>
+            <ul>
+              <li>Funil de etapas e tempos médios</li>
+              <li>Economia negociada</li>
+              <li>Filtros e detalhe do processo</li>
+            </ul>
+          </div>
+        </div>
+        <div class="case-foot">
+          <div class="tags">
+            <span class="tag">Next.js</span><span class="tag">TypeScript</span><span class="tag">PostgreSQL</span>
+            <span class="tag">Supabase</span><span class="tag">Recharts</span><span class="tag">Tailwind CSS</span>
+          </div>
+          <div class="acts">
+            <a href="#" class="btn btn-primary">Ver demonstração</a>
+            <a href="#" class="btn btn-ghost">Detalhes do case</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- CASE 02 -->
+      <article class="card case rv">
+        <div class="case-top">
+          <div>
+            <div class="case-id">case / 02</div>
+            <h3>Dashboard de Faturamento</h3>
+            <p class="sub">Receita, ticket médio e devoluções com comparação automática entre períodos.</p>
+          </div>
+        </div>
+        <div class="case-body">
+          <div>
+            <h4>Problema</h4>
+            <p>Fechamento mensal feito à mão em planilhas, com retrabalho e números que variam conforme quem faz.</p>
+          </div>
+          <div>
+            <h4>Solução</h4>
+            <p>Leitura direta das notas fiscais no banco, com comparação automática com o mesmo período do ano anterior.</p>
+          </div>
+          <div>
+            <h4>Principais funcionalidades</h4>
+            <ul>
+              <li>Faturamento bruto e líquido · ticket médio</li>
+              <li>Evolução mensal e análise por categoria, região e segmento</li>
+              <li>Rankings e taxa de devolução</li>
+            </ul>
+          </div>
+        </div>
+        <div class="case-foot">
+          <div class="tags">
+            <span class="tag">Next.js</span><span class="tag">TypeScript</span><span class="tag">PostgreSQL</span>
+            <span class="tag">Supabase</span><span class="tag">Recharts</span><span class="tag">Tailwind CSS</span>
+          </div>
+          <div class="acts">
+            <a href="#" class="btn btn-primary">Ver demonstração</a>
+            <a href="#" class="btn btn-ghost">Detalhes do case</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- CASE 03 -->
+      <article class="card case rv">
+        <div class="case-top">
+          <div>
+            <div class="case-id">case / 03</div>
+            <h3>Legal BI</h3>
+            <p class="sub">Carteira de processos, risco financeiro e prazos em um único painel.</p>
+          </div>
+        </div>
+        <div class="case-body">
+          <div>
+            <h4>Problema</h4>
+            <p>Carteiras jurídicas mantidas em planilhas por pessoas diferentes, sem visão consolidada.</p>
+          </div>
+          <div>
+            <h4>Solução</h4>
+            <p>Processos, movimentações e prazos organizados, com destaque para o que está vencido ou próximo do vencimento.</p>
+          </div>
+          <div>
+            <h4>Principais funcionalidades</h4>
+            <ul>
+              <li>Taxa de êxito e distribuição por status, área e tribunal</li>
+              <li>Aging da carteira</li>
+              <li>Agenda de prazos (vencidos, 7 e 30 dias)</li>
+            </ul>
+          </div>
+        </div>
+        <div class="case-foot">
+          <div class="tags">
+            <span class="tag">Next.js</span><span class="tag">TypeScript</span><span class="tag">PostgreSQL</span>
+            <span class="tag">Supabase</span><span class="tag">Recharts</span><span class="tag">Tailwind CSS</span>
+          </div>
+          <div class="acts">
+            <a href="#" class="btn btn-primary">Ver demonstração</a>
+            <a href="#" class="btn btn-ghost">Detalhes do case</a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= TECNOLOGIAS ======================= -->
+<section class="section" id="tecnologias">
+  <div class="dots" style="top:30px;left:0"></div>
+  <div class="wrap">
+    <div class="rv">
+      <div class="eyebrow">stack</div>
+      <h2 class="title">Ferramentas do <span class="grad">dia a dia</span>.</h2>
+    </div>
+    <div class="tech rv">
+      <div class="card tech-col">
+        <h3>Dados</h3>
+        <div class="tags">
+          <span class="tag">SQL</span><span class="tag">PostgreSQL</span><span class="tag">SQL Server</span>
+          <span class="tag">Python</span><span class="tag">pandas</span><span class="tag">Excel avançado</span>
+        </div>
+      </div>
+      <div class="card tech-col">
+        <h3>Aplicações</h3>
+        <div class="tags">
+          <span class="tag">TypeScript</span><span class="tag">Next.js</span><span class="tag">React</span>
+          <span class="tag">Node.js</span><span class="tag">Tailwind CSS</span><span class="tag">Recharts</span>
+        </div>
+      </div>
+      <div class="card tech-col">
+        <h3>Plataforma</h3>
+        <div class="tags">
+          <span class="tag">Supabase</span><span class="tag">Vercel</span><span class="tag">Git</span>
+          <span class="tag">GitHub</span><span class="tag">GitHub Actions</span><span class="tag">Docker</span><span class="tag">Linux</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= CONTATO ======================= -->
+<section class="section" id="contato">
+  <div class="wrap">
+    <div class="cta rv">
+      <h2>Tem um processo que <span class="grad">vive em planilhas</span>?</h2>
+      <p>Descreva o problema e receba uma proposta de estruturação dos dados e do que pode ser entregue.</p>
+      <div class="cta-row">
+        <a href="https://www.linkedin.com/in/leandro-santos-data" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+          Vamos conversar sobre o seu projeto?
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a href="https://github.com/devleandroh" class="btn btn-ghost">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-3.16 19.49c.5.09.68-.22.68-.48l-.01-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.36 1.09 2.94.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.6 9.6 0 015 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85l-.01 2.75c0 .27.18.58.69.48A10 10 0 0012 2z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+
+    <div class="notice rv">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.6v.4"/></svg>
+      <p><b>Dados fictícios</b> — Todos os dados e cenários apresentados nas demonstrações são simulados e utilizados apenas para fins ilustrativos.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= RODAPÉ ======================= -->
+<footer>
+  <svg class="waves" viewBox="0 0 1440 170" preserveAspectRatio="none" aria-hidden="true">
+    <defs>
+      <linearGradient id="w1" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#0B74E5"/><stop offset="55%" stop-color="#1E9BFF"/><stop offset="100%" stop-color="#00C85A"/>
+      </linearGradient>
+      <linearGradient id="w2" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#1E9BFF"/><stop offset="100%" stop-color="#22E27A"/>
+      </linearGradient>
+    </defs>
+    <path fill="url(#w1)" fill-opacity=".25" d="M0,70 C240,150 480,10 720,60 C960,110 1200,150 1440,80 L1440,170 L0,170 Z"/>
+    <path fill="url(#w2)" fill-opacity=".45" d="M0,110 C260,50 520,160 780,110 C1020,66 1240,110 1440,130 L1440,170 L0,170 Z"/>
+    <path fill="url(#w1)" fill-opacity=".9" d="M0,140 C300,110 600,170 900,145 C1140,125 1300,150 1440,155 L1440,170 L0,170 Z"/>
+  </svg>
+  <div class="foot-in">
+    <div class="wrap" style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;width:min(1180px,92vw)">
+      <span>© 2026 Leandro Santos. Projeto pessoal de portfólio.</span>
+      <span>
+        <a href="https://www.linkedin.com/in/leandro-santos-data">LinkedIn</a> ·
+        <a href="https://github.com/devleandroh">GitHub</a>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var els = document.querySelectorAll('.rv');
+  if(!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    els.forEach(function(e){e.classList.add('in')}); return;
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); } });
+  },{threshold:.12, rootMargin:'0px 0px -60px 0px'});
+  els.forEach(function(e){io.observe(e)});
+})();
+</script>
+</body>
+</html>
